@@ -11,7 +11,7 @@ const mockOctokit = {
 
 jest.mock('@actions/github', () => {
   return {
-    getOktokit: jest.fn(() => mockOctokit)
+    getOctokit: jest.fn(() => mockOctokit)
   }
 })
 
