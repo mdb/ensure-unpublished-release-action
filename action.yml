@@ -1,11 +1,10 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Mike Ball'
+description: 'Check that a given GitHub release tag does not already exist'
+author: 'mdb'
 inputs:
-  milliseconds: # change this
+  tag:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'The release tag to check for'
 runs:
   using: 'node12'
   main: 'dist/index.js'
