@@ -16,8 +16,6 @@ jest.mock('@actions/github', () => {
 })
 
 test('finds a corresponding release tag', async () => {
-  const result: string = 'found'
-
   mockOctokit.rest.repos.getReleaseByTag.mockImplementation(() => 'result')
 
   const exists = await isExistingRelease('mdb', 'terraputs', '0.0.0')
