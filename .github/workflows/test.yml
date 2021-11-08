@@ -18,3 +18,13 @@ jobs:
         with:
           tag: 0.0.0
           token: ${{ secrets.GITHUB_TOKEN }}
+  ensure-unpublished-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get package.json version
+        run: echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
+      - uses: ./
+        with:
+          tag: ${{ env.VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
