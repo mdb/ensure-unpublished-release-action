@@ -11,21 +11,14 @@ const mockOctokit = {
   }
 }
 
-const repoOwner = 'mdb'
-const repoName = 'terraputs'
-
 jest.mock('@actions/github', () => {
   return {
-    getOctokit: jest.fn(() => mockOctokit),
-    context: {
-      repo: {
-        owner: 'mdb',
-        repo: 'terraputs'
-      }
-    }
+    ...(jest.requireActual('@actions/github') as object),
+    getOctokit: jest.fn(() => mockOctokit)
   }
 })
 
+const repo = 'mdb/terraputs'
 const tag = '500.0.0'
 
 jest.spyOn(core, 'info').mockImplementation(jest.fn())
@@ -37,12 +30,13 @@ test('release does not exist', async () => {
   })
 
   process.env['INPUT_TAG'] = tag
+  process.env['GITHUB_REPOSITORY'] = repo
 
   await run()
 
   expect(core.setFailed).not.toHaveBeenCalled()
   expect(core.info).toHaveBeenCalledWith(
-    `mdb/terraputs release tag ${tag} does not exist`
+    `${repo} release tag ${tag} does not exist`
   )
 })
 
@@ -50,11 +44,27 @@ test('release exists', async () => {
   mockOctokit.rest.repos.getReleaseByTag.mockImplementation(() => 'found')
 
   process.env['INPUT_TAG'] = tag
+  process.env['GITHUB_REPOSITORY'] = repo
 
   await run()
 
   expect(core.setFailed).toHaveBeenCalledWith(
-    `mdb/terraputs release tag ${tag} exists`
+    `${repo} release tag ${tag} exists`
   )
+  expect(core.info).not.toHaveBeenCalled()
+})
+
+test('an error occurs fetching GitHub release data', async () => {
+  const errMessage = 'some error'
+  mockOctokit.rest.repos.getReleaseByTag.mockRejectedValueOnce(
+    new Error(errMessage)
+  )
+
+  process.env['INPUT_TAG'] = tag
+  process.env['GITHUB_REPOSITORY'] = repo
+
+  await run()
+
+  expect(core.setFailed).toHaveBeenCalledWith(errMessage)
   expect(core.info).not.toHaveBeenCalled()
 })
