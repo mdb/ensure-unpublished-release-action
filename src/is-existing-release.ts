@@ -1,3 +1,4 @@
+import {RequestError} from '@octokit/request-error'
 import {getOctokit} from '@actions/github'
 
 export const isExistingRelease = async (
@@ -16,7 +17,7 @@ export const isExistingRelease = async (
 
     return true
   } catch (error) {
-    if ((error as any)?.status === 404) {
+    if ((error as RequestError)?.status === 404) {
       return false
     }
 
