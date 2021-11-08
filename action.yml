@@ -5,6 +5,9 @@ inputs:
   tag:
     required: true
     description: 'The release tag to check for'
+  token:
+    required: true
+    description: 'A GitHub access token'
 runs:
   using: 'node12'
   main: 'dist/index.js'
