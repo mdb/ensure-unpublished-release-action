@@ -1,16 +1,15 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import {context} from '@actions/github'
+import {isExistingRelease} from './is-existing-release'
 
 async function run(): Promise<void> {
+  const {owner, repo} = context.repo
+
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
-
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
+    const tag: string = core.getInput('tag')
+    const exists = await isExistingRelease(owner, repo, tag)
+    if (exists) core.setFailed(`${owner}/${repo} release tag ${tag} exists`)
+    if (!exists) core.info(`${owner}/${repo} release tag ${tag} does not exist`)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
