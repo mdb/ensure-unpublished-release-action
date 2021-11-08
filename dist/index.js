@@ -1,7 +1,7 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 7626:
+/***/ 9146:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -25,7 +25,7 @@ const isExistingRelease = (owner, repo, tag) => __awaiter(void 0, void 0, void 0
         yield octokit.rest.repos.getReleaseByTag({
             owner,
             repo,
-            tag,
+            tag
         });
         return true;
     }
@@ -75,27 +75,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
-const isExistingRelease_1 = __nccwpck_require__(7626);
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const { owner, repo } = github_1.context.repo;
-        try {
-            const tag = core.getInput('tag');
-            const exists = yield (0, isExistingRelease_1.isExistingRelease)(owner, repo, tag);
-            if (exists)
-                core.setFailed(`${owner}/${repo} release tag ${tag} exists`);
-            if (!exists)
-                core.info(`${owner}/${repo} release tag ${tag} does not exist`);
-        }
-        catch (error) {
-            if (error instanceof Error)
-                core.setFailed(error.message);
-        }
-    });
-}
-run();
+const is_existing_release_1 = __nccwpck_require__(9146);
+const run = () => __awaiter(void 0, void 0, void 0, function* () {
+    const { owner, repo } = github_1.context.repo;
+    try {
+        const tag = core.getInput('tag');
+        const exists = yield (0, is_existing_release_1.isExistingRelease)(owner, repo, tag);
+        if (exists)
+            core.setFailed(`${owner}/${repo} release tag ${tag} exists`);
+        if (!exists)
+            core.info(`${owner}/${repo} release tag ${tag} does not exist`);
+    }
+    catch (error) {
+        if (error instanceof Error)
+            core.setFailed(error.message);
+    }
+});
+exports.run = run;
+if (process.env.NODE_ENV !== 'test')
+    (0, exports.run)();
 
 
 /***/ }),

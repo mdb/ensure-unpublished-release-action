@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import {context} from '@actions/github'
 import {isExistingRelease} from './is-existing-release'
 
-async function run(): Promise<void> {
+export const run = async (): Promise<void> => {
   const {owner, repo} = context.repo
 
   try {
@@ -15,4 +15,4 @@ async function run(): Promise<void> {
   }
 }
 
-run()
+if (process.env.NODE_ENV !== 'test') run()
