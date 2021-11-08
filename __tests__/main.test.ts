@@ -1,29 +1,44 @@
-import {wait} from '../src/wait'
 import * as process from 'process'
 import * as cp from 'child_process'
 import * as path from 'path'
 import {expect, test} from '@jest/globals'
 
-test('throws invalid number', async () => {
-  const input = parseInt('foo', 10)
-  await expect(wait(input)).rejects.toThrow('milliseconds not a number')
-})
+// NOTE: these tests require `npm run build` to have been invoked
 
-test('wait 500 ms', async () => {
-  const start = new Date()
-  await wait(500)
-  const end = new Date()
-  var delta = Math.abs(end.getTime() - start.getTime())
-  expect(delta).toBeGreaterThan(450)
-})
+/*
+test('release does not exist', () => {
+  const tag = '500.0.0'
+  process.env['INPUT_TAG'] = tag
 
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  process.env['INPUT_MILLISECONDS'] = '500'
+  const repo = 'mdb/terraputs'
+  process.env['GITHUB_REPOSITORY'] = repo
+
   const np = process.execPath
   const ip = path.join(__dirname, '..', 'lib', 'main.js')
   const options: cp.ExecFileSyncOptions = {
     env: process.env
   }
-  console.log(cp.execFileSync(np, [ip], options).toString())
+  const result = cp.execFileSync(np, [ip], options).toString()
+  console.log(`RESULT: ${result}`)
+
+  expect(result).toBe(`${repo} release tag ${tag} does not exist`)
 })
+
+test('release exists', () => {
+  const tag = '0.0.0'
+  process.env['INPUT_TAG'] = tag
+
+  const repo = 'mdb/terraputs'
+  process.env['GITHUB_REPOSITORY'] = repo
+
+  const np = process.execPath
+  const ip = path.join(__dirname, '..', 'lib', 'main.js')
+  const options: cp.ExecFileSyncOptions = {
+    env: process.env
+  }
+  const result = cp.execFileSync(np, [ip], options).toString()
+  console.log(`RESULT: ${result}`)
+
+  expect(result).toBe(`${repo} release tag ${tag} exists`)
+})
+*/
