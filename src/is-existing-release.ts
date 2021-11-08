@@ -1,3 +1,4 @@
+import * as core from '@actions/core'
 import {RequestError} from '@octokit/request-error'
 import {getOctokit} from '@actions/github'
 
@@ -6,7 +7,8 @@ export const isExistingRelease = async (
   repo: string,
   tag: string
 ): Promise<boolean> => {
-  const octokit = getOctokit(process.env.GITHUB_TOKEN || '')
+  const token: string = core.getInput('token')
+  const octokit = getOctokit(token)
 
   try {
     await octokit.rest.repos.getReleaseByTag({
