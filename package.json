@@ -1,6 +1,6 @@
 {
   "name": "ensure-unpublished-release-action",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "private": true,
   "description": "Check that a given GitHub release tag does not already exist",
   "main": "lib/main.js",
@@ -34,8 +34,8 @@
     "@vercel/ncc": "^0.33.1",
     "eslint": "^7.32.0",
     "eslint-plugin-github": "^4.3.2",
-    "eslint-plugin-jest": "^25.3.4",
-    "jest": "^27.4.5",
+    "eslint-plugin-jest": "^25.7.0",
+    "jest": "^27.4.7",
     "js-yaml": "^4.1.0",
     "prettier": "2.5.1",
     "ts-jest": "^27.1.2",
