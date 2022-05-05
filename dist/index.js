@@ -8,7 +8,11 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -39,7 +43,6 @@ exports.isExistingRelease = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const isExistingRelease = (owner, repo, tag) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const token = core.getInput('token');
     const octokit = (0, github_1.getOctokit)(token);
     try {
@@ -51,7 +54,7 @@ const isExistingRelease = (owner, repo, tag) => __awaiter(void 0, void 0, void 0
         return true;
     }
     catch (error) {
-        if (((_a = error) === null || _a === void 0 ? void 0 : _a.status) === 404) {
+        if ((error === null || error === void 0 ? void 0 : error.status) === 404) {
             return false;
         }
         throw error;
@@ -69,7 +72,11 @@ exports.isExistingRelease = isExistingRelease;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
