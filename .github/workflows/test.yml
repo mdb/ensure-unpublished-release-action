@@ -8,13 +8,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3.3.0
+        with:
+          node-version: 16.x
       - run: npm install
       - run: npm run all
+      - name: Compare expected and actual dist/ directories
+        run: |
+          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
+            echo "Detected uncommitted changes after build:"
+            git diff
+            exit 1
+          fi
   test:
     runs-on: ubuntu-latest
     needs: build
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3.3.0
+        with:
+          node-version: 16.x
       - uses: ./
         with:
           tag: 0.0.0
