@@ -44,6 +44,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+Example failure:
+
+![failure example](example_failure.png)
+
 ## Development
 
 Install dependencies:
