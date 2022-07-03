@@ -4,6 +4,10 @@
 
 A GitHub Action that checks if a given GitHub release tag already exists.
 
+`ensure-unpublished-release-action` succeeds if the provided release tag
+is unique and does not already exist, and fails if the tag has already
+been published as a GitHub release.
+
 ## Usage
 
 ```yaml
@@ -19,7 +23,7 @@ A GitHub Action that checks if a given GitHub release tag already exists.
 ## Example
 
 ```yaml
-name: Check if release version already exists
+name: Check that release version does not already exist
 on:
   pull_request:
 
@@ -28,11 +32,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Get package.json version
-        run: echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
-      - uses: mdb/ensure-unpublished-release-action
+        run: echo "PACKAGE_VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
+
+      # Fail the build if package.json's 'version' property specifies
+      # a value associated with an already-existing release:
+      - uses: mdb/ensure-unpublished-release-action@main
         with:
-          tag: ${{ env.VERSION }}
+          tag: ${{ env.PACKAGE_VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
