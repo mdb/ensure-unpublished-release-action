@@ -48,6 +48,8 @@ Example failure:
 
 ![failure example](example_failure.png)
 
+See `ensure-unpublished-release-action`'s own `.github/workflows` for an additional example.
+
 ## Development
 
 Install dependencies:
