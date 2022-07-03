@@ -1,6 +1,6 @@
 {
   "name": "ensure-unpublished-release-action",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "private": true,
   "description": "Check that a given GitHub release tag does not already exist",
   "main": "lib/main.js",
