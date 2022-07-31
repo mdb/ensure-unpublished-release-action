@@ -8,6 +8,11 @@ inputs:
   token:
     required: true
     description: 'A GitHub access token'
+  fail:
+    type: boolean
+    required: false
+    description: 'Whether or not to fail the action if the release tag has already been published'
+    default: true
 runs:
   using: 'node16'
   main: 'dist/index.js'
