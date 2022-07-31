@@ -116,6 +116,7 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const exists = yield (0, is_existing_release_1.isExistingRelease)(owner, repo, tag);
         if (exists) {
             core.setOutput('exists', true);
+            core.info(existsMessage);
             if (fail)
                 core.setFailed(existsMessage);
         }

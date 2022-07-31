@@ -13,6 +13,7 @@ export const run = async (): Promise<void> => {
 
     if (exists) {
       core.setOutput('exists', true)
+      core.info(existsMessage)
       if (fail) core.setFailed(existsMessage)
     }
 

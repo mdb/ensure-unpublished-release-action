@@ -52,10 +52,10 @@ test('release exists and fail is true', async () => {
 
   await run()
 
+  expect(core.info).toHaveBeenCalledWith(`${repo} release tag ${tag} exists`)
   expect(core.setFailed).toHaveBeenCalledWith(
     `${repo} release tag ${tag} exists`
   )
-  expect(core.info).not.toHaveBeenCalled()
 })
 
 test('release exists and fail is false', async () => {
@@ -67,8 +67,8 @@ test('release exists and fail is false', async () => {
 
   await run()
 
+  expect(core.info).toHaveBeenCalledWith(`${repo} release tag ${tag} exists`)
   expect(core.setFailed).not.toHaveBeenCalled()
-  expect(core.info).not.toHaveBeenCalled()
 })
 
 test('an error occurs fetching GitHub release data', async () => {
