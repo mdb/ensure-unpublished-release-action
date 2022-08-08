@@ -31,7 +31,6 @@ test('release does not exist', async () => {
   })
 
   process.env['INPUT_TAG'] = tag
-  process.env['INPUT_FAIL'] = 'true'
   process.env['GITHUB_REPOSITORY'] = repo
 
   await run()
@@ -43,32 +42,17 @@ test('release does not exist', async () => {
   expect(core.setOutput).toHaveBeenCalledWith('exists', false)
 })
 
-test('release exists and fail is true', async () => {
+test('release exists', async () => {
   mockOctokit.rest.repos.getReleaseByTag.mockImplementation(() => 'found')
 
   process.env['INPUT_TAG'] = tag
-  process.env['INPUT_FAIL'] = 'true'
   process.env['GITHUB_REPOSITORY'] = repo
 
   await run()
 
-  expect(core.info).toHaveBeenCalledWith(`${repo} release tag ${tag} exists`)
   expect(core.setFailed).toHaveBeenCalledWith(
     `${repo} release tag ${tag} exists`
   )
-})
-
-test('release exists and fail is false', async () => {
-  mockOctokit.rest.repos.getReleaseByTag.mockImplementation(() => 'found')
-
-  process.env['INPUT_TAG'] = tag
-  process.env['INPUT_FAIL'] = 'false'
-  process.env['GITHUB_REPOSITORY'] = repo
-
-  await run()
-
-  expect(core.info).toHaveBeenCalledWith(`${repo} release tag ${tag} exists`)
-  expect(core.setFailed).not.toHaveBeenCalled()
 })
 
 test('an error occurs fetching GitHub release data', async () => {
@@ -78,7 +62,6 @@ test('an error occurs fetching GitHub release data', async () => {
   )
 
   process.env['INPUT_TAG'] = tag
-  process.env['INPUT_FAIL'] = 'true'
   process.env['GITHUB_REPOSITORY'] = repo
 
   await run()

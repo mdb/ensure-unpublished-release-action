@@ -7,14 +7,11 @@ export const run = async (): Promise<void> => {
 
   try {
     const tag: string = core.getInput('tag')
-    const fail: boolean = core.getBooleanInput('fail')
-    const existsMessage = `${owner}/${repo} release tag ${tag} exists`
     const exists = await isExistingRelease(owner, repo, tag)
 
     if (exists) {
       core.setOutput('exists', true)
-      core.info(existsMessage)
-      if (fail) core.setFailed(existsMessage)
+      core.setFailed(`${owner}/${repo} release tag ${tag} exists`)
     }
 
     if (!exists) {
