@@ -22,6 +22,7 @@ const repo = 'mdb/terraputs'
 const tag = '500.0.0'
 
 jest.spyOn(core, 'info').mockImplementation(jest.fn())
+jest.spyOn(core, 'setOutput').mockImplementation(jest.fn())
 jest.spyOn(core, 'setFailed').mockImplementation(jest.fn())
 
 test('release does not exist', async () => {
@@ -38,6 +39,7 @@ test('release does not exist', async () => {
   expect(core.info).toHaveBeenCalledWith(
     `${repo} release tag ${tag} does not exist`
   )
+  expect(core.setOutput).toHaveBeenCalledWith('exists', false)
 })
 
 test('release exists', async () => {
@@ -51,7 +53,6 @@ test('release exists', async () => {
   expect(core.setFailed).toHaveBeenCalledWith(
     `${repo} release tag ${tag} exists`
   )
-  expect(core.info).not.toHaveBeenCalled()
 })
 
 test('an error occurs fetching GitHub release data', async () => {

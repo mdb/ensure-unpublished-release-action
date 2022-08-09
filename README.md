@@ -4,9 +4,10 @@
 
 A GitHub Action that checks if a given GitHub release tag already exists.
 
-`ensure-unpublished-release-action` succeeds if the provided release tag
-is unique and does not already exist, and fails if the tag has already
-been published as a GitHub release.
+In default configuration, `ensure-unpublished-release-action` succeeds if the provided release tag
+is unique and does not already exist, and fails if the tag has already been published as a GitHub release.
+
+The action produces an `exists` output whose value is `true` or `false`.
 
 ## Usage
 

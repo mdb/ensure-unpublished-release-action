@@ -112,10 +112,14 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const tag = core.getInput('tag');
         const exists = yield (0, is_existing_release_1.isExistingRelease)(owner, repo, tag);
-        if (exists)
+        if (exists) {
+            core.setOutput('exists', true);
             core.setFailed(`${owner}/${repo} release tag ${tag} exists`);
-        if (!exists)
+        }
+        if (!exists) {
+            core.setOutput('exists', false);
             core.info(`${owner}/${repo} release tag ${tag} does not exist`);
+        }
     }
     catch (error) {
         if (error instanceof Error)
