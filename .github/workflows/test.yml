@@ -1,4 +1,6 @@
+---
 name: build-and-test
+
 on:
   pull_request:
   push:
@@ -8,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3.4.1
+      - uses: actions/setup-node@v3.5.1
         with:
-          node-version: 16.x
+          node-version-file: '.nvmrc'
       - run: npm install
       - run: npm run all
       - name: Compare expected and actual dist/ directories
@@ -25,9 +27,9 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3.4.1
+      - uses: actions/setup-node@v3.5.1
         with:
-          node-version: 16.x
+          node-version-file: '.nvmrc'
       - uses: ./
         with:
           tag: 0.0.0
