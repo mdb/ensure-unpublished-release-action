@@ -35,11 +35,10 @@ test('does not find a corresponding release tag', async () => {
 
 test('the GitHub API responds with an error', async () => {
   const response = {status: 500}
+
   mockOctokit.rest.repos.getReleaseByTag.mockRejectedValueOnce(response)
 
-  try {
-    await isExistingRelease('mdb', 'terraputs', '500.0.0')
-  } catch (error) {
-    expect(error).toBe(response)
-  }
+  await expect(
+    isExistingRelease('mdb', 'terraputs', '500.0.0')
+  ).rejects.toStrictEqual(response)
 })
