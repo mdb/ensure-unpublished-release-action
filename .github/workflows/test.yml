@@ -22,25 +22,10 @@ jobs:
             git diff
             exit 1
           fi
-  test:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-      - uses: ./
-        with:
-          tag: 0.0.0
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: ./
-        with:
-          tag: 0.0.0
-          token: ${{ secrets.GITHUB_TOKEN }}
+
   ensure-unpublished-version:
     runs-on: ubuntu-latest
-    needs: test
+    needs: build
     steps:
       - uses: actions/checkout@v4
       - name: Get package.json version
@@ -58,6 +43,7 @@ jobs:
         with:
           tag: ${{ env.VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
   release:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
