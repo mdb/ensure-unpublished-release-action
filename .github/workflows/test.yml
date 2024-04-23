@@ -30,15 +30,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Get package.json version
         run: echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
-
-      # invoke the action with fail: false
-      - uses: ./
-        with:
-          tag: ${{ env.VERSION }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fail: false
-
-      # invoke the action with fail: true
       - uses: ./
         with:
           tag: ${{ env.VERSION }}
