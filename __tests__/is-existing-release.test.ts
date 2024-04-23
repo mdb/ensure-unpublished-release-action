@@ -24,9 +24,11 @@ test('finds a corresponding release tag', async () => {
 })
 
 test('does not find a corresponding release tag', async () => {
-  mockOctokit.rest.repos.getReleaseByTag.mockRejectedValueOnce({
-    status: 404
-  })
+  mockOctokit.rest.repos.getReleaseByTag = jest
+    .fn<() => Promise<never>>()
+    .mockRejectedValue({
+      status: 404
+    })
 
   const exists = await isExistingRelease('mdb', 'terraputs', '500.0.0')
 
@@ -36,7 +38,9 @@ test('does not find a corresponding release tag', async () => {
 test('the GitHub API responds with an error', async () => {
   const response = {status: 500}
 
-  mockOctokit.rest.repos.getReleaseByTag.mockRejectedValueOnce(response)
+  mockOctokit.rest.repos.getReleaseByTag = jest
+    .fn<() => Promise<never>>()
+    .mockRejectedValueOnce(response)
 
   await expect(
     isExistingRelease('mdb', 'terraputs', '500.0.0')
