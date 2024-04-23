@@ -26,9 +26,11 @@ jest.spyOn(core, 'setOutput').mockImplementation(jest.fn())
 jest.spyOn(core, 'setFailed').mockImplementation(jest.fn())
 
 test('release does not exist', async () => {
-  mockOctokit.rest.repos.getReleaseByTag.mockRejectedValueOnce({
-    status: 404
-  })
+  mockOctokit.rest.repos.getReleaseByTag = jest
+    .fn<() => Promise<never>>()
+    .mockRejectedValueOnce({
+      status: 404
+    })
 
   process.env['INPUT_TAG'] = tag
   process.env['GITHUB_REPOSITORY'] = repo
@@ -57,9 +59,10 @@ test('release exists', async () => {
 
 test('an error occurs fetching GitHub release data', async () => {
   const errMessage = 'some error'
-  mockOctokit.rest.repos.getReleaseByTag.mockRejectedValueOnce(
-    new Error(errMessage)
-  )
+
+  mockOctokit.rest.repos.getReleaseByTag = jest
+    .fn<() => Promise<never>>()
+    .mockRejectedValueOnce(new Error(errMessage))
 
   process.env['INPUT_TAG'] = tag
   process.env['GITHUB_REPOSITORY'] = repo
