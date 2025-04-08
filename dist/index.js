@@ -112,9 +112,14 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const tag = core.getInput('tag');
         const exists = yield (0, is_existing_release_1.isExistingRelease)(owner, repo, tag);
+        const customFailureMessage = core.getInput('failure-message');
+        let failureMessage = `${owner}/${repo} release tag ${tag} exists`;
+        if (customFailureMessage !== '') {
+            failureMessage += `. ${customFailureMessage}`;
+        }
         if (exists) {
             core.setOutput('exists', true);
-            core.setFailed(`${owner}/${repo} release tag ${tag} exists`);
+            core.setFailed(failureMessage);
         }
         if (!exists) {
             core.setOutput('exists', false);
