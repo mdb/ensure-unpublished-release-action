@@ -8,10 +8,15 @@ export const run = async (): Promise<void> => {
   try {
     const tag: string = core.getInput('tag')
     const exists = await isExistingRelease(owner, repo, tag)
+    const customFailureMessage: string = core.getInput('failure-message')
+    let failureMessage = `${owner}/${repo} release tag ${tag} exists`
+    if (customFailureMessage !== '') {
+      failureMessage += `. ${customFailureMessage}`
+    }
 
     if (exists) {
       core.setOutput('exists', true)
-      core.setFailed(`${owner}/${repo} release tag ${tag} exists`)
+      core.setFailed(failureMessage)
     }
 
     if (!exists) {
