@@ -1,5 +1,4 @@
 import * as core from '@actions/core'
-import {context} from '@actions/github'
 import {jest, expect, test} from '@jest/globals'
 import {run} from '../src/main'
 
@@ -54,6 +53,20 @@ test('release exists', async () => {
 
   expect(core.setFailed).toHaveBeenCalledWith(
     `${repo} release tag ${tag} exists`
+  )
+})
+
+test('release exists with custom failure message', async () => {
+  mockOctokit.rest.repos.getReleaseByTag.mockImplementation(() => 'found')
+
+  process.env['INPUT_TAG'] = tag
+  process.env['INPUT_FAILURE-MESSAGE'] = 'Do something.'
+  process.env['GITHUB_REPOSITORY'] = repo
+
+  await run()
+
+  expect(core.setFailed).toHaveBeenCalledWith(
+    `${repo} release tag ${tag} exists. Do something.`
   )
 })
 
