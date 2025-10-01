@@ -12,6 +12,7 @@
     "test": "NODE_ENV=test jest",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mdb/ensure-unpublished-release-action.git"
