@@ -1,13 +1,12 @@
 {
   "name": "ensure-unpublished-release-action",
-  "version": "0.1.12",
-  "description": "Check that a given GitHub release tag does not already exist",
-  "main": "lib/main.js",
+  "version": "0.1.13",
+  "description": "Check that a given GitHub release tag does not already exist", "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "NODE_ENV=test jest",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
@@ -29,15 +28,16 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
-    "@typescript-eslint/parser": "^7.7.0",
+    "@typescript-eslint/parser": "^8.45.0",
     "@vercel/ncc": "^0.38.3",
-    "eslint": "^8.56.0",
-    "eslint-plugin-github": "^4.10.2",
+    "eslint": "^9.36.0",
+    "eslint-plugin-github": "^5.1.8",
+    "eslint-plugin-github": "^6.0.0",
     "eslint-plugin-jest": "^28.11.0",
     "eslint-plugin-prettier": "^5.5.4",
     "jest": "^30.0.0",
     "js-yaml": "^4.1.0",
     "ts-jest": "^29.3.1",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   }
 }
