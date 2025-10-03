@@ -4,8 +4,7 @@
   "description": "Check that a given GitHub release tag does not already exist", "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write '**/*.ts'",
-    "format-check": "prettier --check '**/*.ts'",
+    "format": "prettier --write '**/*.ts'", "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "NODE_ENV=test jest",
@@ -24,7 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.11.1",
-    "@actions/github": "6.0.0"
+    "@actions/github": "6.0.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
