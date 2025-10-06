@@ -1,10 +1,12 @@
 {
   "name": "ensure-unpublished-release-action",
-  "version": "0.1.14",
-  "description": "Check that a given GitHub release tag does not already exist", "main": "lib/main.js",
+  "version": "0.1.15",
+  "description": "Check that a given GitHub release tag does not already exist",
+  "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write '**/*.ts'", "format-check": "prettier --check '**/*.ts'",
+    "format": "prettier --write '**/*.ts'",
+    "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "NODE_ENV=test jest",
