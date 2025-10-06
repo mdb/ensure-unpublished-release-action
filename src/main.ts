@@ -6,6 +6,23 @@ export const run = async (): Promise<void> => {
   const {owner, repo} = context.repo
 
   try {
+    const skipPattern: string = core.getInput('skip_pattern')
+    const commitMessage: string = core.getInput('commit_message')
+
+    if (skipPattern && !commitMessage) {
+      throw new Error(
+        `commit_message unspecified. skip_pattern (${skipPattern}) requires specifying a commit_message`
+      )
+    }
+
+    if (skipPattern && commitMessage && commitMessage.includes(skipPattern)) {
+      core.setOutput('exists', false)
+      core.info(
+        `skipping ensure-unpublished-release; commit specifies ${skipPattern}`
+      )
+      return
+    }
+
     const tag: string = core.getInput('tag')
     const exists = await isExistingRelease(owner, repo, tag)
     const customFailureMessage: string = core.getInput('failure-message')
