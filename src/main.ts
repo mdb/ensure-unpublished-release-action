@@ -6,12 +6,12 @@ export const run = async (): Promise<void> => {
   const {owner, repo} = context.repo
 
   try {
-    const skipPattern: string = core.getInput('skip_pattern')
-    const commitMessage: string = core.getInput('commit_message')
+    const skipPattern: string = core.getInput('skip-pattern')
+    const commitMessage: string = core.getInput('commit-message')
 
     if (skipPattern && !commitMessage) {
       throw new Error(
-        `commit_message unspecified. skip_pattern (${skipPattern}) requires specifying a commit_message`
+        `commit-message unspecified. skip-pattern (${skipPattern}) requires specifying a commit-message`
       )
     }
 
