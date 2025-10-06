@@ -130,10 +130,10 @@ const is_existing_release_1 = __nccwpck_require__(1122);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     const { owner, repo } = github_1.context.repo;
     try {
-        const skipPattern = core.getInput('skip_pattern');
-        const commitMessage = core.getInput('commit_message');
+        const skipPattern = core.getInput('skip-pattern');
+        const commitMessage = core.getInput('commit-message');
         if (skipPattern && !commitMessage) {
-            throw new Error(`commit_message unspecified. skip_pattern (${skipPattern}) requires specifying a commit_message`);
+            throw new Error(`commit-message unspecified. skip-pattern (${skipPattern}) requires specifying a commit-message`);
         }
         if (skipPattern && commitMessage && commitMessage.includes(skipPattern)) {
             core.setOutput('exists', false);

@@ -20,15 +20,15 @@ The action produces an `exists` output whose value is `true` or `false`.
     # Required; a GitHub access token (typically `secrets.GITHUB_TOKEN`)
     token:
 
-    # Optional; if the specified skip_pattern is present in the specified
-    # commit_message, skip unpublished release tag evaluation and succeed
+    # Optional; if the specified skip-pattern is present in the specified
+    # commit-message, skip unpublished release tag evaluation and succeed
     # (ex: [skip ensure-unpublished-release]
     # If set, requires commit_message.
-    skip_pattern: 
+    skip-pattern: 
 
     # Optional; the commit message (typically ${{ github.event.head_commit.message }}
-    # Required if skip_pattern is set.
-    commit_message: 
+    # Required if skip-pattern is set.
+    commit-message: 
 ```
 
 ## Example
