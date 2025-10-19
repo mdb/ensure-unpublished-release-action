@@ -86,9 +86,9 @@ test('an error occurs fetching GitHub release data', async () => {
   expect(core.info).not.toHaveBeenCalled()
 })
 
-test('the specified commit_message includes the specified skip_pattern', async () => {
+test('the specified commit_message includes the specified skip-commit-message-pattern', async () => {
   const skipPattern = '[skip version-eval]'
-  process.env['INPUT_SKIP-PATTERN'] = skipPattern
+  process.env['INPUT_SKIP-COMMIT-MESSAGE-PATTERN'] = skipPattern
   process.env['INPUT_COMMIT-MESSAGE'] = `foo bar ${skipPattern} foo bar`
 
   await run()
@@ -100,14 +100,14 @@ test('the specified commit_message includes the specified skip_pattern', async (
   expect(core.setOutput).toHaveBeenCalledWith('exists', false)
 })
 
-test('a skip-pattern is defined but no commit-message is defined', async () => {
+test('a skip-commit-message-pattern is defined but no commit-message is defined', async () => {
   const skipPattern = '[skip version-eval]'
-  process.env['INPUT_SKIP-PATTERN'] = skipPattern
+  process.env['INPUT_SKIP-COMMIT-MESSAGE-PATTERN'] = skipPattern
   process.env['INPUT_COMMIT-MESSAGE'] = ''
 
   await run()
 
-  const errMessage = `commit-message unspecified. skip-pattern (${skipPattern}) requires specifying a commit-message`
+  const errMessage = `commit-message unspecified. skip-commit-message-pattern (${skipPattern}) requires specifying a commit-message`
   expect(core.setFailed).toHaveBeenCalledWith(errMessage)
   expect(core.setOutput).not.toHaveBeenCalled()
 })

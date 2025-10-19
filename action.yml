@@ -11,12 +11,12 @@ inputs:
   failure-message:
     required: false
     description: 'An optional customized message to display on failure'
-  skip-pattern:
+  skip-commit-message-pattern:
     required: false
-    description: 'If the specified skip-pattern is present in the specified commit-message, skip unpublished release tag evaluation and succeed'
+    description: 'If the specified skip-commit-message-pattern is present in the specified commit-message, skip unpublished release tag evaluation and succeed'
   commit-message:
     required: false
-    description: 'The commit message. Required if skip-pattern is specified.'
+    description: 'The commit message. Required if skip-commit-message-pattern is specified.'
 runs:
   using: 'node20'
   main: 'dist/index.js'
