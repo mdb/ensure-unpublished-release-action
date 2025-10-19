@@ -14,6 +14,10 @@ inputs:
   skip-commit-message-pattern:
     required: false
     description: 'If the specified skip-commit-message-pattern is present in the specified commit-message, skip unpublished release tag evaluation and succeed'
+  skip-pattern:
+    required: false
+    description: 'Deprecated; use skip-commit-message-pattern.'
+    deprecationMessage: 'Use skip-commit-message-pattern instead of skip-pattern'
   commit-message:
     required: false
     description: 'The commit message. Required if skip-commit-message-pattern is specified.'

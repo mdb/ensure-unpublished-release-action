@@ -6,9 +6,17 @@ export const run = async (): Promise<void> => {
   const {owner, repo} = context.repo
 
   try {
-    const skipMessagePattern: string = core.getInput(
+    const skipPattern: string = core.getInput('skip-pattern')
+    if (skipPattern) {
+      core.warning(
+        'skip-pattern is deprecated. Use skip-commit-message-pattern.'
+      )
+    }
+
+    const skipCommitMessagePattern: string = core.getInput(
       'skip-commit-message-pattern'
     )
+    const skipMessagePattern = skipCommitMessagePattern || skipPattern
     const commitMessage: string = core.getInput('commit-message')
 
     if (skipMessagePattern && !commitMessage) {

@@ -21,12 +21,14 @@ const repo = 'mdb/terraputs'
 const tag = '500.0.0'
 
 jest.spyOn(core, 'info').mockImplementation(jest.fn())
+jest.spyOn(core, 'warning').mockImplementation(jest.fn())
 jest.spyOn(core, 'setOutput').mockImplementation(jest.fn())
 jest.spyOn(core, 'setFailed').mockImplementation(jest.fn())
 
 afterEach(() => {
   process.env['INPUT_TAG'] = ''
   process.env['INPUT_FAILURE-MESSAGE'] = ''
+  process.env['INPUT_SKIP-PATTERN'] = ''
   process.env['INPUT_SKIP-COMMIT-MESSAGE-PATTERN'] = ''
   process.env['INPUT_COMMIT-MESSAGE'] = ''
   process.env['INPUT_SKIP-AUTHOR'] = ''
@@ -93,6 +95,23 @@ test('an error occurs fetching GitHub release data', async () => {
 
   expect(core.setFailed).toHaveBeenCalledWith(errMessage)
   expect(core.info).not.toHaveBeenCalled()
+})
+
+test('the specified commit-message includes the specified skip-pattern', async () => {
+  const skipPattern = '[skip version-eval]'
+  process.env['INPUT_SKIP-PATTERN'] = skipPattern
+  process.env['INPUT_COMMIT-MESSAGE'] = `foo bar ${skipPattern} foo bar`
+
+  await run()
+
+  expect(core.setFailed).not.toHaveBeenCalled()
+  expect(core.info).toHaveBeenCalledWith(
+    `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
+  )
+  expect(core.setOutput).toHaveBeenCalledWith('exists', false)
+  expect(core.warning).toHaveBeenCalledWith(
+    'skip-pattern is deprecated. Use skip-commit-message-pattern.'
+  )
 })
 
 test('the specified commit-message includes the specified skip-commit-message-pattern', async () => {
