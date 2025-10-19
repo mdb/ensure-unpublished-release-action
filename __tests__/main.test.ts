@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import {jest, expect, test} from '@jest/globals'
+import {jest, expect, test, afterEach} from '@jest/globals'
 import {run} from '../src/main'
 
 const mockOctokit = {
@@ -23,6 +23,15 @@ const tag = '500.0.0'
 jest.spyOn(core, 'info').mockImplementation(jest.fn())
 jest.spyOn(core, 'setOutput').mockImplementation(jest.fn())
 jest.spyOn(core, 'setFailed').mockImplementation(jest.fn())
+
+afterEach(() => {
+  process.env['INPUT_TAG'] = ''
+  process.env['INPUT_FAILURE-MESSAGE'] = ''
+  process.env['INPUT_SKIP-COMMIT-MESSAGE-PATTERN'] = ''
+  process.env['INPUT_COMMIT-MESSAGE'] = ''
+  process.env['INPUT_SKIP-AUTHOR'] = ''
+  process.env['INPUT_AUTHOR'] = ''
+})
 
 test('release does not exist', async () => {
   mockOctokit.rest.repos.getReleaseByTag = jest
@@ -86,7 +95,7 @@ test('an error occurs fetching GitHub release data', async () => {
   expect(core.info).not.toHaveBeenCalled()
 })
 
-test('the specified commit_message includes the specified skip-commit-message-pattern', async () => {
+test('the specified commit-message includes the specified skip-commit-message-pattern', async () => {
   const skipPattern = '[skip version-eval]'
   process.env['INPUT_SKIP-COMMIT-MESSAGE-PATTERN'] = skipPattern
   process.env['INPUT_COMMIT-MESSAGE'] = `foo bar ${skipPattern} foo bar`
@@ -108,6 +117,32 @@ test('a skip-commit-message-pattern is defined but no commit-message is defined'
   await run()
 
   const errMessage = `commit-message unspecified. skip-commit-message-pattern (${skipPattern}) requires specifying a commit-message`
+  expect(core.setFailed).toHaveBeenCalledWith(errMessage)
+  expect(core.setOutput).not.toHaveBeenCalled()
+})
+
+test('the author matches the skip-author', async () => {
+  const author = 'foo-bar'
+  process.env['INPUT_SKIP-AUTHOR'] = author
+  process.env['INPUT_AUTHOR'] = author
+
+  await run()
+
+  expect(core.setFailed).not.toHaveBeenCalled()
+  expect(core.info).toHaveBeenCalledWith(
+    `skipping ensure-unpublished-release; author is ${author}`
+  )
+  expect(core.setOutput).toHaveBeenCalledWith('exists', false)
+})
+
+test('a skip-author is defined but no author is defined', async () => {
+  const skipAuthor = 'foo-bar'
+  process.env['INPUT_SKIP-AUTHOR'] = skipAuthor
+  process.env['INPUT_AUTHOR'] = ''
+
+  await run()
+
+  const errMessage = `author unspecified. skip-author (${skipAuthor}) requires specifying an author`
   expect(core.setFailed).toHaveBeenCalledWith(errMessage)
   expect(core.setOutput).not.toHaveBeenCalled()
 })

@@ -29,6 +29,25 @@ export const run = async (): Promise<void> => {
       return
     }
 
+    const skipAuthor: string = core.getInput('skip-author')
+    const author: string = core.getInput('author')
+
+    if (skipAuthor && !author) {
+      throw new Error(
+        `author unspecified. skip-author (${skipAuthor}) requires specifying an author`
+      )
+    }
+
+    if (
+      skipAuthor &&
+      author &&
+      author.toLowerCase() === skipAuthor.toLowerCase()
+    ) {
+      core.setOutput('exists', false)
+      core.info(`skipping ensure-unpublished-release; author is ${skipAuthor}`)
+      return
+    }
+
     const tag: string = core.getInput('tag')
     const exists = await isExistingRelease(owner, repo, tag)
     const customFailureMessage: string = core.getInput('failure-message')

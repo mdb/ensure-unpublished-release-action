@@ -142,6 +142,18 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
             core.info(`skipping ensure-unpublished-release; commit specifies ${skipMessagePattern}`);
             return;
         }
+        const skipAuthor = core.getInput('skip-author');
+        const author = core.getInput('author');
+        if (skipAuthor && !author) {
+            throw new Error(`author unspecified. skip-author (${skipAuthor}) requires specifying an author`);
+        }
+        if (skipAuthor &&
+            author &&
+            author.toLowerCase() === skipAuthor.toLowerCase()) {
+            core.setOutput('exists', false);
+            core.info(`skipping ensure-unpublished-release; author is ${skipAuthor}`);
+            return;
+        }
         const tag = core.getInput('tag');
         const exists = yield (0, is_existing_release_1.isExistingRelease)(owner, repo, tag);
         const customFailureMessage = core.getInput('failure-message');

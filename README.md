@@ -29,6 +29,15 @@ The action produces an `exists` output whose value is `true` or `false`.
     # Optional; the commit message (typically ${{ github.event.head_commit.message }}
     # Required if skip-commit-message-pattern is set.
     commit-message: 
+
+    # Optional; If the specified skip-author matches the specified author, skip
+    # unpublished release tag evaluation and succeed
+    # (ex: dependabot[bot])
+    skip-author:
+
+    # Optional; the commit author
+    # Required if skip-author is set.
+    author:
 ```
 
 ## Example

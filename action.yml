@@ -17,6 +17,13 @@ inputs:
   commit-message:
     required: false
     description: 'The commit message. Required if skip-commit-message-pattern is specified.'
+  skip-author:
+    required: false
+    description: 'If the specified skip-author matches the specified author, skip unpublished release tag evaluation and succeed'
+  author:
+    required: false
+    description: 'The commit author. Required if skip-author is specified.'
+
 runs:
   using: 'node20'
   main: 'dist/index.js'
