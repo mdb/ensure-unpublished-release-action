@@ -29,22 +29,23 @@ export const run = async (): Promise<void> => {
       return
     }
 
-    const skipAuthor: string = core.getInput('skip-author')
+    const skipAuthors: string = core.getInput('skip-authors')
     const author: string = core.getInput('author')
+    const skipAuthorsList = skipAuthors.split('\n')
 
-    if (skipAuthor && !author) {
+    if (skipAuthors && !author) {
       throw new Error(
-        `author unspecified. skip-author (${skipAuthor}) requires specifying an author`
+        `author unspecified. skip-authors (${skipAuthorsList.join(', ')}) requires specifying an author`
       )
     }
 
     if (
-      skipAuthor &&
+      skipAuthors &&
       author &&
-      author.toLowerCase() === skipAuthor.toLowerCase()
+      skipAuthorsList.includes(author.toLowerCase())
     ) {
       core.setOutput('exists', false)
-      core.info(`skipping ensure-unpublished-release; author is ${skipAuthor}`)
+      core.info(`skipping ensure-unpublished-release; author is ${author}`)
       return
     }
 

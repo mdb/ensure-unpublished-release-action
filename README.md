@@ -22,21 +22,28 @@ The action produces an `exists` output whose value is `true` or `false`.
 
     # Optional; if the specified skip-message-pattern is present in the specified
     # commit-message, skip unpublished release tag evaluation and succeed
-    # (ex: [skip ensure-unpublished-release]
     # If set, requires commit_message.
+    # Example:
+    # skip-commit-message-pattern: [skip ensure-version]
     skip-commit-message-pattern: 
 
     # Optional; the commit message (typically ${{ github.event.head_commit.message }}
     # Required if skip-commit-message-pattern is set.
     commit-message: 
 
-    # Optional; If the specified skip-author matches the specified author, skip
+    # Optional; If any of the specified newline-separated list of skip-authors
+    # matches the specified author, skip
     # unpublished release tag evaluation and succeed
     # (ex: dependabot[bot])
-    skip-author:
+    # Example:
+    # skip-authors: |
+    #   dependabot[bot]
+    #   Ian Mackaye
+    #   Jeff Nelson
+    skip-authors:
 
     # Optional; the commit author
-    # Required if skip-author is set.
+    # Required if skip-authors is set.
     author:
 ```
 

@@ -142,16 +142,17 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
             core.info(`skipping ensure-unpublished-release; commit specifies ${skipMessagePattern}`);
             return;
         }
-        const skipAuthor = core.getInput('skip-author');
+        const skipAuthors = core.getInput('skip-authors');
         const author = core.getInput('author');
-        if (skipAuthor && !author) {
-            throw new Error(`author unspecified. skip-author (${skipAuthor}) requires specifying an author`);
+        const skipAuthorsList = skipAuthors.split('\n');
+        if (skipAuthors && !author) {
+            throw new Error(`author unspecified. skip-authors (${skipAuthorsList.join(', ')}) requires specifying an author`);
         }
-        if (skipAuthor &&
+        if (skipAuthors &&
             author &&
-            author.toLowerCase() === skipAuthor.toLowerCase()) {
+            skipAuthorsList.includes(author.toLowerCase())) {
             core.setOutput('exists', false);
-            core.info(`skipping ensure-unpublished-release; author is ${skipAuthor}`);
+            core.info(`skipping ensure-unpublished-release; author is ${author}`);
             return;
         }
         const tag = core.getInput('tag');

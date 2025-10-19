@@ -121,9 +121,11 @@ test('a skip-commit-message-pattern is defined but no commit-message is defined'
   expect(core.setOutput).not.toHaveBeenCalled()
 })
 
-test('the author matches the skip-author', async () => {
+test('the skip-authors includes the author', async () => {
   const author = 'foo-bar'
-  process.env['INPUT_SKIP-AUTHOR'] = author
+  process.env['INPUT_SKIP-AUTHORS'] = `foo-bar
+baz
+bim`
   process.env['INPUT_AUTHOR'] = author
 
   await run()
@@ -135,14 +137,14 @@ test('the author matches the skip-author', async () => {
   expect(core.setOutput).toHaveBeenCalledWith('exists', false)
 })
 
-test('a skip-author is defined but no author is defined', async () => {
-  const skipAuthor = 'foo-bar'
-  process.env['INPUT_SKIP-AUTHOR'] = skipAuthor
+test('a skip-authors is defined but no author is defined', async () => {
+  const skipAuthors = 'foo-bar'
+  process.env['INPUT_SKIP-AUTHORS'] = skipAuthors
   process.env['INPUT_AUTHOR'] = ''
 
   await run()
 
-  const errMessage = `author unspecified. skip-author (${skipAuthor}) requires specifying an author`
+  const errMessage = `author unspecified. skip-authors (${skipAuthors}) requires specifying an author`
   expect(core.setFailed).toHaveBeenCalledWith(errMessage)
   expect(core.setOutput).not.toHaveBeenCalled()
 })

@@ -17,9 +17,9 @@ inputs:
   commit-message:
     required: false
     description: 'The commit message. Required if skip-commit-message-pattern is specified.'
-  skip-author:
+  skip-authors:
     required: false
-    description: 'If the specified skip-author matches the specified author, skip unpublished release tag evaluation and succeed'
+    description: 'If any of the specified newline-separated list of skip-authors matches the specified author, skip unpublished release tag evaluation and succeed'
   author:
     required: false
     description: 'The commit author. Required if skip-author is specified.'
