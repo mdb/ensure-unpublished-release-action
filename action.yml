@@ -11,12 +11,23 @@ inputs:
   failure-message:
     required: false
     description: 'An optional customized message to display on failure'
+  skip-commit-message-pattern:
+    required: false
+    description: 'If the specified skip-commit-message-pattern is present in the specified commit-message, skip unpublished release tag evaluation and succeed'
   skip-pattern:
     required: false
-    description: 'If the specified skip-pattern is present in the specified commit-message, skip unpublished release tag evaluation and succeed'
+    description: 'Deprecated; use skip-commit-message-pattern.'
+    deprecationMessage: 'Use skip-commit-message-pattern instead of skip-pattern'
   commit-message:
     required: false
-    description: 'The commit message. Required if skip-pattern is specified.'
+    description: 'The commit message. Required if skip-commit-message-pattern is specified.'
+  skip-authors:
+    required: false
+    description: 'If any of the specified newline-separated list of skip-authors matches the specified author, skip unpublished release tag evaluation and succeed'
+  author:
+    required: false
+    description: 'The commit author. Required if skip-author is specified.'
+
 runs:
   using: 'node20'
   main: 'dist/index.js'

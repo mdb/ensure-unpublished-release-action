@@ -7,19 +7,53 @@ export const run = async (): Promise<void> => {
 
   try {
     const skipPattern: string = core.getInput('skip-pattern')
-    const commitMessage: string = core.getInput('commit-message')
-
-    if (skipPattern && !commitMessage) {
-      throw new Error(
-        `commit-message unspecified. skip-pattern (${skipPattern}) requires specifying a commit-message`
+    if (skipPattern) {
+      core.warning(
+        'skip-pattern is deprecated. Use skip-commit-message-pattern.'
       )
     }
 
-    if (skipPattern && commitMessage && commitMessage.includes(skipPattern)) {
+    const skipCommitMessagePattern: string = core.getInput(
+      'skip-commit-message-pattern'
+    )
+    const skipMessagePattern = skipCommitMessagePattern || skipPattern
+    const commitMessage: string = core.getInput('commit-message')
+
+    if (skipMessagePattern && !commitMessage) {
+      throw new Error(
+        `commit-message unspecified. skip-commit-message-pattern (${skipMessagePattern}) requires specifying a commit-message`
+      )
+    }
+
+    if (
+      skipMessagePattern &&
+      commitMessage &&
+      commitMessage.includes(skipMessagePattern)
+    ) {
       core.setOutput('exists', false)
       core.info(
-        `skipping ensure-unpublished-release; commit specifies ${skipPattern}`
+        `skipping ensure-unpublished-release; commit specifies ${skipMessagePattern}`
       )
+      return
+    }
+
+    const skipAuthors: string = core.getInput('skip-authors')
+    const author: string = core.getInput('author')
+    const skipAuthorsList = skipAuthors.split('\n')
+
+    if (skipAuthors && !author) {
+      throw new Error(
+        `author unspecified. skip-authors (${skipAuthorsList.join(', ')}) requires specifying an author`
+      )
+    }
+
+    if (
+      skipAuthors &&
+      author &&
+      skipAuthorsList.includes(author.toLowerCase())
+    ) {
+      core.setOutput('exists', false)
+      core.info(`skipping ensure-unpublished-release; author is ${author}`)
       return
     }
 
