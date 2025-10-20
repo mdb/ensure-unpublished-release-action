@@ -30,15 +30,29 @@ jobs:
     needs: build-and-test
     steps:
       - uses: actions/checkout@v5
+        if: github.event_name != 'pull_request'
+      - uses: actions/checkout@v5
+        if: github.event_name == 'pull_request'
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Get head commit author
+        id: author
+        run: |
+          COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
+          echo "commit_author=$COMMIT_AUTHOR" >> $GITHUB_OUTPUT
+      - name: Show author
+        run: echo "${{ steps.author.outputs.commit_author }}"
       - name: Get package.json version
         run: echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
       - uses: ./
         with:
           tag: ${{ env.VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          skip-authors: 'dependabot[bot]'
+          author: ${{ steps.author.outputs.commit_author }}
 
   release:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && ${{ github.event.head_commit.author.name }} != 'dependabot[bot]'
     runs-on: ubuntu-latest
     needs: ensure-unpublished-version
     steps:
