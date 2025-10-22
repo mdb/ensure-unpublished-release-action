@@ -27,6 +27,11 @@ inputs:
   author:
     required: false
     description: 'The commit author. Required if skip-author is specified.'
+outputs:
+  exists:
+    description: 'true if the GitHub release tag already exists; false if not'
+  skipped:
+    description: 'true if evaluation was skipped; false if not'
 
 runs:
   using: 'node20'
