@@ -35,6 +35,8 @@ jobs:
     outputs:
       commit-author: ${{ steps.commit-author.outputs.commit-author }}
       commit-message: ${{ steps.commit-message.outputs.commit-message }}
+      skipped: ${{ steps.ensure-unpublished-version.outputs.skipped }}
+      exists: ${{ steps.ensure-unpublished-version.outputs.exists }}
     steps:
       - uses: actions/checkout@v5
 
@@ -73,6 +75,7 @@ jobs:
         run: echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
 
       - uses: ./
+        id: ensure-unpublished-version
         with:
           tag: ${{ env.VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -80,6 +83,11 @@ jobs:
           author: ${{ steps.commit-details.outputs.commit-author }}
           skip-commit-message-pattern: '[skip release]'
           commit-message: ${{ steps.commit-details.outputs.commit-message }}
+
+      - name: Show ensure-unpublished-version outputs
+        run: |
+          echo "skipped: ${{ steps.ensure-unpublished-version.outputs.skipped }}"
+          echo "exists: ${{ steps.ensure-unpublished-version.outputs.exists }}"
 
   release:
     if: ${{ github.ref == 'refs/heads/main' && needs.ensure-unpublished-version.outputs.skipped != 'true' }}
