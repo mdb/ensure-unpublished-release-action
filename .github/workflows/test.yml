@@ -12,11 +12,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+
       - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
+
       - run: npm install
+
       - run: npm run all
+
       - name: Compare expected and actual dist/ directories
         run: |
           if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
@@ -28,35 +32,62 @@ jobs:
   ensure-unpublished-version:
     runs-on: ubuntu-latest
     needs: build-and-test
+    outputs:
+      commit-author: ${{ steps.commit-author.outputs.commit-author }}
+      commit-message: ${{ steps.commit-message.outputs.commit-message }}
     steps:
       - uses: actions/checkout@v5
-        if: github.event_name != 'pull_request'
-      - uses: actions/checkout@v5
+
+      - name: Get commit message (pull_request)
         if: github.event_name == 'pull_request'
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Get head commit author
-        id: author
         run: |
-          COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
-          echo "commit_author=$COMMIT_AUTHOR" >> $GITHUB_OUTPUT
-      - name: Show author
-        run: echo "${{ steps.author.outputs.commit_author }}"
+          pr_num="${{ github.event.pull_request.number }}"
+          git fetch origin refs/pull/${pr_num}/head:refs/remotes/origin/pull/${pr_num}/head
+          echo "COMMIT_MESSAGE="$(git log -1 --pretty=format:"%B" origin/pull/${pr_num}/head)"" >> $GITHUB_ENV
+          echo "PR_NUM="${pr_num}"" >> $GITHUB_ENV
+
+      - name: Get commit message (push, etc.)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: echo "COMMIT_MESSAGE="$(git log -1 --pretty=%B)"" >> $GITHUB_ENV
+
+      - name: Get commit author (pull request)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: echo "COMMIT_AUTHOR="$(git log -1 --pretty=format:"%an" origin/pull/${PR_NUM}/head)"" >> $GITHUB_ENV
+
+      - name: Get commit author (push, etc.)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: echo "COMMIT_AUTHOR="$(git log -1 --pretty=%an)"" >> $GITHUB_ENV
+
+      - name: Get commit details
+        id: commit-details
+        run: |
+          echo "commit-author="${COMMIT_AUTHOR}"" >> $GITHUB_OUTPUT
+          echo "commit-message="${COMMIT_MESSAGE}"" >> $GITHUB_OUTPUT
+
+      - name: Show commit details
+        run: |
+          echo "author: ${{ steps.commit-details.outputs.commit-author }}"
+          echo "commit message: ${{ steps.commit-details.outputs.commit-message }}"
+
       - name: Get package.json version
         run: echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
+
       - uses: ./
         with:
           tag: ${{ env.VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
           skip-authors: 'dependabot[bot]'
-          author: ${{ steps.author.outputs.commit_author }}
+          author: ${{ steps.commit-details.outputs.commit-author }}
+          skip-commit-message-pattern: '[skip release]'
+          commit-message: ${{ steps.commit-details.outputs.commit-message }}
 
   release:
-    if: github.ref == 'refs/heads/main' && ${{ github.event.head_commit.author.name }} != 'dependabot[bot]'
+    if: ${{ github.ref == 'refs/heads/main' && needs.ensure-unpublished-version.outputs.skipped != 'true' }}
     runs-on: ubuntu-latest
     needs: ensure-unpublished-version
     steps:
       - uses: actions/checkout@v5
+
       - name: Release
         run: gh release create "$(jq -r .version package.json)" --generate-notes
         env:

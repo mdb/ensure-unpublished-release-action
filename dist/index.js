@@ -144,6 +144,7 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
             commitMessage &&
             commitMessage.includes(skipMessagePattern)) {
             core.setOutput('exists', false);
+            core.setOutput('skipped', true);
             core.info(`skipping ensure-unpublished-release; commit specifies ${skipMessagePattern}`);
             return;
         }
@@ -157,9 +158,11 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
             author &&
             skipAuthorsList.includes(author.toLowerCase())) {
             core.setOutput('exists', false);
+            core.setOutput('skipped', true);
             core.info(`skipping ensure-unpublished-release; author is ${author}`);
             return;
         }
+        core.setOutput('skipped', false);
         const tag = core.getInput('tag');
         const exists = yield (0, is_existing_release_1.isExistingRelease)(owner, repo, tag);
         const customFailureMessage = core.getInput('failure-message');

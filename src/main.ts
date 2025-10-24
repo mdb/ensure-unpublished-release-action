@@ -31,6 +31,7 @@ export const run = async (): Promise<void> => {
       commitMessage.includes(skipMessagePattern)
     ) {
       core.setOutput('exists', false)
+      core.setOutput('skipped', true)
       core.info(
         `skipping ensure-unpublished-release; commit specifies ${skipMessagePattern}`
       )
@@ -53,9 +54,12 @@ export const run = async (): Promise<void> => {
       skipAuthorsList.includes(author.toLowerCase())
     ) {
       core.setOutput('exists', false)
+      core.setOutput('skipped', true)
       core.info(`skipping ensure-unpublished-release; author is ${author}`)
       return
     }
+
+    core.setOutput('skipped', false)
 
     const tag: string = core.getInput('tag')
     const exists = await isExistingRelease(owner, repo, tag)

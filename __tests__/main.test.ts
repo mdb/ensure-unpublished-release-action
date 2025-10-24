@@ -52,6 +52,7 @@ test('release does not exist', async () => {
     `${repo} release tag ${tag} does not exist`
   )
   expect(core.setOutput).toHaveBeenCalledWith('exists', false)
+  expect(core.setOutput).toHaveBeenCalledWith('skipped', false)
 })
 
 test('release exists', async () => {
@@ -62,6 +63,8 @@ test('release exists', async () => {
 
   await run()
 
+  expect(core.setOutput).toHaveBeenCalledWith('skipped', false)
+  expect(core.setOutput).toHaveBeenCalledWith('exists', true)
   expect(core.setFailed).toHaveBeenCalledWith(
     `${repo} release tag ${tag} exists`
   )
@@ -76,6 +79,8 @@ test('release exists with custom failure message', async () => {
 
   await run()
 
+  expect(core.setOutput).toHaveBeenCalledWith('skipped', false)
+  expect(core.setOutput).toHaveBeenCalledWith('exists', true)
   expect(core.setFailed).toHaveBeenCalledWith(
     `${repo} release tag ${tag} exists. Do something.`
   )
@@ -109,6 +114,7 @@ test('the specified commit-message includes the specified skip-pattern', async (
     `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
   )
   expect(core.setOutput).toHaveBeenCalledWith('exists', false)
+  expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
   expect(core.warning).toHaveBeenCalledWith(
     'skip-pattern is deprecated. Use skip-commit-message-pattern.'
   )
@@ -126,6 +132,7 @@ test('the specified commit-message includes the specified skip-commit-message-pa
     `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
   )
   expect(core.setOutput).toHaveBeenCalledWith('exists', false)
+  expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
 })
 
 test('a skip-commit-message-pattern is defined but no commit-message is defined', async () => {
@@ -154,6 +161,7 @@ bim`
     `skipping ensure-unpublished-release; author is ${author}`
   )
   expect(core.setOutput).toHaveBeenCalledWith('exists', false)
+  expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
 })
 
 test('a skip-authors is defined but no author is defined', async () => {
