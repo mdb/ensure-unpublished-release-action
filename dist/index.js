@@ -49,7 +49,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isExistingRelease = void 0;
+exports.shouldSkip = exports.isExistingRelease = void 0;
 const core = __importStar(__nccwpck_require__(7484));
 const github_1 = __nccwpck_require__(3228);
 const isExistingRelease = (owner, repo, tag) => __awaiter(void 0, void 0, void 0, function* () {
@@ -71,6 +71,36 @@ const isExistingRelease = (owner, repo, tag) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.isExistingRelease = isExistingRelease;
+const shouldSkip = () => {
+    const skipPattern = core.getInput('skip-pattern');
+    if (skipPattern) {
+        core.warning('skip-pattern is deprecated. Use skip-commit-message-pattern.');
+    }
+    const skipCommitMessagePattern = core.getInput('skip-commit-message-pattern');
+    const skipMessagePattern = skipCommitMessagePattern || skipPattern;
+    const commitMessage = core.getInput('commit-message');
+    if (skipMessagePattern && !commitMessage) {
+        throw new Error(`commit-message unspecified. skip-commit-message-pattern (${skipMessagePattern}) requires specifying a commit-message`);
+    }
+    if (skipMessagePattern &&
+        commitMessage &&
+        commitMessage.includes(skipMessagePattern)) {
+        core.info(`skipping ensure-unpublished-release; commit specifies ${skipMessagePattern}`);
+        return true;
+    }
+    const skipAuthors = core.getInput('skip-authors');
+    const author = core.getInput('author');
+    const skipAuthorsList = skipAuthors.split('\n');
+    if (skipAuthors && !author) {
+        throw new Error(`author unspecified. skip-authors (${skipAuthorsList.join(', ')}) requires specifying an author`);
+    }
+    if (skipAuthors && author && skipAuthorsList.includes(author.toLowerCase())) {
+        core.info(`skipping ensure-unpublished-release; author is ${author}`);
+        return true;
+    }
+    return false;
+};
+exports.shouldSkip = shouldSkip;
 
 
 /***/ }),
@@ -130,36 +160,9 @@ const is_existing_release_1 = __nccwpck_require__(1122);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     const { owner, repo } = github_1.context.repo;
     try {
-        const skipPattern = core.getInput('skip-pattern');
-        if (skipPattern) {
-            core.warning('skip-pattern is deprecated. Use skip-commit-message-pattern.');
-        }
-        const skipCommitMessagePattern = core.getInput('skip-commit-message-pattern');
-        const skipMessagePattern = skipCommitMessagePattern || skipPattern;
-        const commitMessage = core.getInput('commit-message');
-        if (skipMessagePattern && !commitMessage) {
-            throw new Error(`commit-message unspecified. skip-commit-message-pattern (${skipMessagePattern}) requires specifying a commit-message`);
-        }
-        if (skipMessagePattern &&
-            commitMessage &&
-            commitMessage.includes(skipMessagePattern)) {
+        if ((0, is_existing_release_1.shouldSkip)()) {
             core.setOutput('exists', false);
             core.setOutput('skipped', true);
-            core.info(`skipping ensure-unpublished-release; commit specifies ${skipMessagePattern}`);
-            return;
-        }
-        const skipAuthors = core.getInput('skip-authors');
-        const author = core.getInput('author');
-        const skipAuthorsList = skipAuthors.split('\n');
-        if (skipAuthors && !author) {
-            throw new Error(`author unspecified. skip-authors (${skipAuthorsList.join(', ')}) requires specifying an author`);
-        }
-        if (skipAuthors &&
-            author &&
-            skipAuthorsList.includes(author.toLowerCase())) {
-            core.setOutput('exists', false);
-            core.setOutput('skipped', true);
-            core.info(`skipping ensure-unpublished-release; author is ${author}`);
             return;
         }
         core.setOutput('skipped', false);
