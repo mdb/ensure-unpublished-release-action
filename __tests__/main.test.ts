@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import {jest, expect, test, afterEach} from '@jest/globals'
+import {jest, expect, test, afterEach, describe} from '@jest/globals'
 import {run} from '../src/main'
 
 const mockOctokit = {
@@ -35,143 +35,145 @@ afterEach(() => {
   process.env['INPUT_AUTHOR'] = ''
 })
 
-test('release does not exist', async () => {
-  mockOctokit.rest.repos.getReleaseByTag = jest
-    .fn<() => Promise<never>>()
-    .mockRejectedValueOnce({
-      status: 404
-    })
+describe('#run', () => {
+  test('when the release does not exist', async () => {
+    mockOctokit.rest.repos.getReleaseByTag = jest
+      .fn<() => Promise<never>>()
+      .mockRejectedValueOnce({
+        status: 404
+      })
 
-  process.env['INPUT_TAG'] = tag
-  process.env['GITHUB_REPOSITORY'] = repo
+    process.env['INPUT_TAG'] = tag
+    process.env['GITHUB_REPOSITORY'] = repo
 
-  await run()
+    await run()
 
-  expect(core.setFailed).not.toHaveBeenCalled()
-  expect(core.info).toHaveBeenCalledWith(
-    `${repo} release tag ${tag} does not exist`
-  )
-  expect(core.setOutput).toHaveBeenCalledWith('exists', false)
-  expect(core.setOutput).toHaveBeenCalledWith('skipped', false)
-})
+    expect(core.setFailed).not.toHaveBeenCalled()
+    expect(core.info).toHaveBeenCalledWith(
+      `${repo} release tag ${tag} does not exist`
+    )
+    expect(core.setOutput).toHaveBeenCalledWith('exists', false)
+    expect(core.setOutput).toHaveBeenCalledWith('skipped', false)
+  })
 
-test('release exists', async () => {
-  mockOctokit.rest.repos.getReleaseByTag.mockImplementation(() => 'found')
+  test('when the release exists', async () => {
+    mockOctokit.rest.repos.getReleaseByTag.mockImplementation(() => 'found')
 
-  process.env['INPUT_TAG'] = tag
-  process.env['GITHUB_REPOSITORY'] = repo
+    process.env['INPUT_TAG'] = tag
+    process.env['GITHUB_REPOSITORY'] = repo
 
-  await run()
+    await run()
 
-  expect(core.setOutput).toHaveBeenCalledWith('skipped', false)
-  expect(core.setOutput).toHaveBeenCalledWith('exists', true)
-  expect(core.setFailed).toHaveBeenCalledWith(
-    `${repo} release tag ${tag} exists`
-  )
-})
+    expect(core.setOutput).toHaveBeenCalledWith('skipped', false)
+    expect(core.setOutput).toHaveBeenCalledWith('exists', true)
+    expect(core.setFailed).toHaveBeenCalledWith(
+      `${repo} release tag ${tag} exists`
+    )
+  })
 
-test('release exists with custom failure message', async () => {
-  mockOctokit.rest.repos.getReleaseByTag.mockImplementation(() => 'found')
+  test('when the release exists with custom failure message', async () => {
+    mockOctokit.rest.repos.getReleaseByTag.mockImplementation(() => 'found')
 
-  process.env['INPUT_TAG'] = tag
-  process.env['INPUT_FAILURE-MESSAGE'] = 'Do something.'
-  process.env['GITHUB_REPOSITORY'] = repo
+    process.env['INPUT_TAG'] = tag
+    process.env['INPUT_FAILURE-MESSAGE'] = 'Do something.'
+    process.env['GITHUB_REPOSITORY'] = repo
 
-  await run()
+    await run()
 
-  expect(core.setOutput).toHaveBeenCalledWith('skipped', false)
-  expect(core.setOutput).toHaveBeenCalledWith('exists', true)
-  expect(core.setFailed).toHaveBeenCalledWith(
-    `${repo} release tag ${tag} exists. Do something.`
-  )
-})
+    expect(core.setOutput).toHaveBeenCalledWith('skipped', false)
+    expect(core.setOutput).toHaveBeenCalledWith('exists', true)
+    expect(core.setFailed).toHaveBeenCalledWith(
+      `${repo} release tag ${tag} exists. Do something.`
+    )
+  })
 
-test('an error occurs fetching GitHub release data', async () => {
-  const errMessage = 'some error'
+  test('when an error occurs fetching GitHub release data', async () => {
+    const errMessage = 'some error'
 
-  mockOctokit.rest.repos.getReleaseByTag = jest
-    .fn<() => Promise<never>>()
-    .mockRejectedValueOnce(new Error(errMessage))
+    mockOctokit.rest.repos.getReleaseByTag = jest
+      .fn<() => Promise<never>>()
+      .mockRejectedValueOnce(new Error(errMessage))
 
-  process.env['INPUT_TAG'] = tag
-  process.env['GITHUB_REPOSITORY'] = repo
+    process.env['INPUT_TAG'] = tag
+    process.env['GITHUB_REPOSITORY'] = repo
 
-  await run()
+    await run()
 
-  expect(core.setFailed).toHaveBeenCalledWith(errMessage)
-  expect(core.info).not.toHaveBeenCalled()
-})
+    expect(core.setFailed).toHaveBeenCalledWith(errMessage)
+    expect(core.info).not.toHaveBeenCalled()
+  })
 
-test('the specified commit-message includes the specified skip-pattern', async () => {
-  const skipPattern = '[skip version-eval]'
-  process.env['INPUT_SKIP-PATTERN'] = skipPattern
-  process.env['INPUT_COMMIT-MESSAGE'] = `foo bar ${skipPattern} foo bar`
+  test('when the specified commit-message includes the specified skip-pattern', async () => {
+    const skipPattern = '[skip version-eval]'
+    process.env['INPUT_SKIP-PATTERN'] = skipPattern
+    process.env['INPUT_COMMIT-MESSAGE'] = `foo bar ${skipPattern} foo bar`
 
-  await run()
+    await run()
 
-  expect(core.setFailed).not.toHaveBeenCalled()
-  expect(core.info).toHaveBeenCalledWith(
-    `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
-  )
-  expect(core.setOutput).toHaveBeenCalledWith('exists', false)
-  expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
-  expect(core.warning).toHaveBeenCalledWith(
-    'skip-pattern is deprecated. Use skip-commit-message-pattern.'
-  )
-})
+    expect(core.setFailed).not.toHaveBeenCalled()
+    expect(core.info).toHaveBeenCalledWith(
+      `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
+    )
+    expect(core.setOutput).toHaveBeenCalledWith('exists', false)
+    expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
+    expect(core.warning).toHaveBeenCalledWith(
+      'skip-pattern is deprecated. Use skip-commit-message-pattern.'
+    )
+  })
 
-test('the specified commit-message includes the specified skip-commit-message-pattern', async () => {
-  const skipPattern = '[skip version-eval]'
-  process.env['INPUT_SKIP-COMMIT-MESSAGE-PATTERN'] = skipPattern
-  process.env['INPUT_COMMIT-MESSAGE'] = `foo bar ${skipPattern} foo bar`
+  test('when the specified commit-message includes the specified skip-commit-message-pattern', async () => {
+    const skipPattern = '[skip version-eval]'
+    process.env['INPUT_SKIP-COMMIT-MESSAGE-PATTERN'] = skipPattern
+    process.env['INPUT_COMMIT-MESSAGE'] = `foo bar ${skipPattern} foo bar`
 
-  await run()
+    await run()
 
-  expect(core.setFailed).not.toHaveBeenCalled()
-  expect(core.info).toHaveBeenCalledWith(
-    `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
-  )
-  expect(core.setOutput).toHaveBeenCalledWith('exists', false)
-  expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
-})
+    expect(core.setFailed).not.toHaveBeenCalled()
+    expect(core.info).toHaveBeenCalledWith(
+      `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
+    )
+    expect(core.setOutput).toHaveBeenCalledWith('exists', false)
+    expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
+  })
 
-test('a skip-commit-message-pattern is defined but no commit-message is defined', async () => {
-  const skipPattern = '[skip version-eval]'
-  process.env['INPUT_SKIP-COMMIT-MESSAGE-PATTERN'] = skipPattern
-  process.env['INPUT_COMMIT-MESSAGE'] = ''
+  test('when a skip-commit-message-pattern is defined but no commit-message is defined', async () => {
+    const skipPattern = '[skip version-eval]'
+    process.env['INPUT_SKIP-COMMIT-MESSAGE-PATTERN'] = skipPattern
+    process.env['INPUT_COMMIT-MESSAGE'] = ''
 
-  await run()
+    await run()
 
-  const errMessage = `commit-message unspecified. skip-commit-message-pattern (${skipPattern}) requires specifying a commit-message`
-  expect(core.setFailed).toHaveBeenCalledWith(errMessage)
-  expect(core.setOutput).not.toHaveBeenCalled()
-})
+    const errMessage = `commit-message unspecified. skip-commit-message-pattern (${skipPattern}) requires specifying a commit-message`
+    expect(core.setFailed).toHaveBeenCalledWith(errMessage)
+    expect(core.setOutput).not.toHaveBeenCalled()
+  })
 
-test('the skip-authors includes the author', async () => {
-  const author = 'foo-bar'
-  process.env['INPUT_SKIP-AUTHORS'] = `foo-bar
+  test('when the skip-authors includes the author', async () => {
+    const author = 'foo-bar'
+    process.env['INPUT_SKIP-AUTHORS'] = `foo-bar
 baz
 bim`
-  process.env['INPUT_AUTHOR'] = author
+    process.env['INPUT_AUTHOR'] = author
 
-  await run()
+    await run()
 
-  expect(core.setFailed).not.toHaveBeenCalled()
-  expect(core.info).toHaveBeenCalledWith(
-    `skipping ensure-unpublished-release; author is ${author}`
-  )
-  expect(core.setOutput).toHaveBeenCalledWith('exists', false)
-  expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
-})
+    expect(core.setFailed).not.toHaveBeenCalled()
+    expect(core.info).toHaveBeenCalledWith(
+      `skipping ensure-unpublished-release; author is ${author}`
+    )
+    expect(core.setOutput).toHaveBeenCalledWith('exists', false)
+    expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
+  })
 
-test('a skip-authors is defined but no author is defined', async () => {
-  const skipAuthors = 'foo-bar'
-  process.env['INPUT_SKIP-AUTHORS'] = skipAuthors
-  process.env['INPUT_AUTHOR'] = ''
+  test('when a skip-authors is defined but no author is defined', async () => {
+    const skipAuthors = 'foo-bar'
+    process.env['INPUT_SKIP-AUTHORS'] = skipAuthors
+    process.env['INPUT_AUTHOR'] = ''
 
-  await run()
+    await run()
 
-  const errMessage = `author unspecified. skip-authors (${skipAuthors}) requires specifying an author`
-  expect(core.setFailed).toHaveBeenCalledWith(errMessage)
-  expect(core.setOutput).not.toHaveBeenCalled()
+    const errMessage = `author unspecified. skip-authors (${skipAuthors}) requires specifying an author`
+    expect(core.setFailed).toHaveBeenCalledWith(errMessage)
+    expect(core.setOutput).not.toHaveBeenCalled()
+  })
 })
