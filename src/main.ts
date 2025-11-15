@@ -6,30 +6,21 @@ export const run = async (): Promise<void> => {
   const {owner, repo} = context.repo
 
   try {
-    if (shouldSkip()) {
-      core.setOutput('exists', false)
-      core.setOutput('skipped', true)
-      return
-    }
-
-    core.setOutput('skipped', false)
+    const skipped = shouldSkip() ? true : false
+    core.setOutput('skipped', skipped)
 
     const tag: string = core.getInput('tag')
     const exists = await isExistingRelease(owner, repo, tag)
-    const customFailureMessage: string = core.getInput('failure-message')
+    core.setOutput('exists', exists)
+
     let failureMessage = `${owner}/${repo} release tag ${tag} exists`
+    const customFailureMessage: string = core.getInput('failure-message')
     if (customFailureMessage !== '') {
       failureMessage += `. ${customFailureMessage}`
     }
 
-    if (exists) {
-      core.setOutput('exists', true)
+    if (exists && !skipped) {
       core.setFailed(failureMessage)
-    }
-
-    if (!exists) {
-      core.setOutput('exists', false)
-      core.info(`${owner}/${repo} release tag ${tag} does not exist`)
     }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)

@@ -13,7 +13,7 @@ inputs:
     description: 'An optional customized message to display on failure'
   skip-commit-message-pattern:
     required: false
-    description: 'If the specified skip-commit-message-pattern is present in the specified commit-message, skip unpublished release tag evaluation and succeed'
+    description: 'If the specified skip-commit-message-pattern is present in the specified commit-message, do not fail, regardless of whether the release exists.'
   skip-pattern:
     required: false
     description: 'Deprecated; use skip-commit-message-pattern.'
@@ -23,7 +23,7 @@ inputs:
     description: 'The commit message. Required if skip-commit-message-pattern is specified.'
   skip-authors:
     required: false
-    description: 'If any of the specified newline-separated list of skip-authors matches the specified author, skip unpublished release tag evaluation and succeed'
+    description: 'If any of the specified newline-separated list of skip-authors matches the specified author, do not fail, regardless of whether the release exists.'
   author:
     required: false
     description: 'The commit author. Required if skip-author is specified.'

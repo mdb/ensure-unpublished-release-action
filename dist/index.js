@@ -65,6 +65,7 @@ const isExistingRelease = (owner, repo, tag) => __awaiter(void 0, void 0, void 0
     }
     catch (error) {
         if ((error === null || error === void 0 ? void 0 : error.status) === 404) {
+            core.info(`${owner}/${repo} release tag ${tag} does not exist`);
             return false;
         }
         throw error;
@@ -160,26 +161,18 @@ const is_existing_release_1 = __nccwpck_require__(1122);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     const { owner, repo } = github_1.context.repo;
     try {
-        if ((0, is_existing_release_1.shouldSkip)()) {
-            core.setOutput('exists', false);
-            core.setOutput('skipped', true);
-            return;
-        }
-        core.setOutput('skipped', false);
+        const skipped = (0, is_existing_release_1.shouldSkip)() ? true : false;
+        core.setOutput('skipped', skipped);
         const tag = core.getInput('tag');
         const exists = yield (0, is_existing_release_1.isExistingRelease)(owner, repo, tag);
-        const customFailureMessage = core.getInput('failure-message');
+        core.setOutput('exists', exists);
         let failureMessage = `${owner}/${repo} release tag ${tag} exists`;
+        const customFailureMessage = core.getInput('failure-message');
         if (customFailureMessage !== '') {
             failureMessage += `. ${customFailureMessage}`;
         }
-        if (exists) {
-            core.setOutput('exists', true);
+        if (exists && !skipped) {
             core.setFailed(failureMessage);
-        }
-        if (!exists) {
-            core.setOutput('exists', false);
-            core.info(`${owner}/${repo} release tag ${tag} does not exist`);
         }
     }
     catch (error) {

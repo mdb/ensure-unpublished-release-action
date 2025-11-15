@@ -20,9 +20,10 @@ The action produces an `exists` output whose value is `true` or `false`.
     # Required; a GitHub access token (typically `secrets.GITHUB_TOKEN`)
     token:
 
-    # Optional; if the specified skip-message-pattern is present in the specified
-    # commit-message, skip unpublished release tag evaluation and succeed
-    # If set, requires commit_message.
+    # Optional; if the specified skip-commit-message-pattern is present in the
+    # specified commit-message, do not fail, regardless of whether the release
+    # exists or not.
+    # If set, requires commit-message.
     # Example:
     # skip-commit-message-pattern: [skip ensure-version]
     skip-commit-message-pattern: 
@@ -32,8 +33,8 @@ The action produces an `exists` output whose value is `true` or `false`.
     commit-message: 
 
     # Optional; If any of the specified newline-separated list of skip-authors
-    # matches the specified author, skip
-    # unpublished release tag evaluation and succeed
+    # matches the specified author, do not fail, regardless of whether the release
+    # exists or not.
     # (ex: dependabot[bot])
     # Example:
     # skip-authors: |
