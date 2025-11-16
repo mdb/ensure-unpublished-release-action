@@ -20,6 +20,7 @@ export const isExistingRelease = async (
     return true
   } catch (error) {
     if ((error as RequestError)?.status === 404) {
+      core.info(`${owner}/${repo} release tag ${tag} does not exist`)
       return false
     }
 

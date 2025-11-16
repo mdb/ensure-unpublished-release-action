@@ -103,10 +103,34 @@ describe('#run', () => {
     expect(core.info).not.toHaveBeenCalled()
   })
 
-  test('when the specified commit-message includes the specified skip-pattern', async () => {
+  test('when the specified commit-message includes the specified skip-pattern and the release exists', async () => {
     const skipPattern = '[skip version-eval]'
     process.env['INPUT_SKIP-PATTERN'] = skipPattern
     process.env['INPUT_COMMIT-MESSAGE'] = `foo bar ${skipPattern} foo bar`
+
+    await run()
+
+    expect(core.setFailed).not.toHaveBeenCalled()
+    expect(core.info).toHaveBeenCalledWith(
+      `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
+    )
+    expect(core.setOutput).toHaveBeenCalledWith('exists', true)
+    expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
+    expect(core.warning).toHaveBeenCalledWith(
+      'skip-pattern is deprecated. Use skip-commit-message-pattern.'
+    )
+  })
+
+  test('when the specified commit-message includes the specified skip-pattern and the release does not exist', async () => {
+    const skipPattern = '[skip version-eval]'
+    process.env['INPUT_SKIP-PATTERN'] = skipPattern
+    process.env['INPUT_COMMIT-MESSAGE'] = `foo bar ${skipPattern} foo bar`
+
+    mockOctokit.rest.repos.getReleaseByTag = jest
+      .fn<() => Promise<never>>()
+      .mockRejectedValueOnce({
+        status: 404
+      })
 
     await run()
 
@@ -121,10 +145,31 @@ describe('#run', () => {
     )
   })
 
-  test('when the specified commit-message includes the specified skip-commit-message-pattern', async () => {
+  test('when the specified commit-message includes the specified skip-commit-message-pattern and the release exists', async () => {
     const skipPattern = '[skip version-eval]'
     process.env['INPUT_SKIP-COMMIT-MESSAGE-PATTERN'] = skipPattern
     process.env['INPUT_COMMIT-MESSAGE'] = `foo bar ${skipPattern} foo bar`
+
+    await run()
+
+    expect(core.setFailed).not.toHaveBeenCalled()
+    expect(core.info).toHaveBeenCalledWith(
+      `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
+    )
+    expect(core.setOutput).toHaveBeenCalledWith('exists', true)
+    expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
+  })
+
+  test('when the specified commit-message includes the specified skip-commit-message-pattern and the release does not exist', async () => {
+    const skipPattern = '[skip version-eval]'
+    process.env['INPUT_SKIP-COMMIT-MESSAGE-PATTERN'] = skipPattern
+    process.env['INPUT_COMMIT-MESSAGE'] = `foo bar ${skipPattern} foo bar`
+
+    mockOctokit.rest.repos.getReleaseByTag = jest
+      .fn<() => Promise<never>>()
+      .mockRejectedValueOnce({
+        status: 404
+      })
 
     await run()
 
@@ -148,7 +193,7 @@ describe('#run', () => {
     expect(core.setOutput).not.toHaveBeenCalled()
   })
 
-  test('when the skip-authors includes the author', async () => {
+  test('when the skip-authors includes the author and the release exists', async () => {
     const author = 'foo-bar'
     process.env['INPUT_SKIP-AUTHORS'] = `foo-bar
 baz
@@ -161,7 +206,7 @@ bim`
     expect(core.info).toHaveBeenCalledWith(
       `skipping ensure-unpublished-release; author is ${author}`
     )
-    expect(core.setOutput).toHaveBeenCalledWith('exists', false)
+    expect(core.setOutput).toHaveBeenCalledWith('exists', true)
     expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
   })
 
