@@ -11,7 +11,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-node@v6
         with:
@@ -38,7 +38,7 @@ jobs:
       skipped: ${{ steps.ensure-unpublished-version.outputs.skipped }}
       exists: ${{ steps.ensure-unpublished-version.outputs.exists }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Get commit message (pull_request)
         if: github.event_name == 'pull_request'
@@ -95,7 +95,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: ensure-unpublished-version
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Release
         run: gh release create "$(jq -r .version package.json)" --generate-notes
