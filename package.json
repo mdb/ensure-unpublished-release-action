@@ -1,6 +1,6 @@
 {
   "name": "ensure-unpublished-release-action",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Check that a given GitHub release tag does not already exist",
   "main": "lib/main.js",
   "scripts": {
@@ -28,7 +28,7 @@
     "@actions/github": "6.0.1"
   },
   "devDependencies": {
-    "@types/node": "^25.0.1",
+    "@types/node": "^25.0.3",
     "@typescript-eslint/parser": "^8.50.0",
     "@vercel/ncc": "^0.38.3",
     "eslint": "^9.39.2",
