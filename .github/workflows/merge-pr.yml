@@ -1,0 +1,55 @@
+name: Merge PR
+
+on:
+  workflow_dispatch:
+  inputs:
+    pr-number:
+      required: true
+      type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get PR details
+        id: pr-details
+        shell: bash
+        run: |
+          pr_title="$(gh pr view \
+            "$PR_URL" \
+            --json title \
+            --jq '.title')"
+          echo "pr-title=$pr_title" >> "$GITHUB_OUTPUT"
+          echo "pr-url=$PR_URL" >> "$GITHUB_OUTPUT"
+        env:
+          PR_URL: "https://github.com/mdb/ensure-unpublished-release/pulls/${{ inputs.pr-number }}"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check checks
+        run: gh pr checks "${{ steps.pr-details.outputs.pr-url }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Approve PR
+        run: |
+          gh pr review \
+            --approve \
+            "$PR_URL"
+        env:
+          PR_URL: "${{ steps.pr-details.outputs.pr-url }}"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge PR
+        run: |
+          gh pr merge \
+            --auto \
+            --body "${{ steps.pr-details.outputs.pr-title }}\n[skip release]"
+            "$PR_URL"
+        env:
+          PR_URL: "${{ steps.pr-details.outputs.pr-url }}"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
