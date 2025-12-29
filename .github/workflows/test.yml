@@ -92,6 +92,8 @@ jobs:
 
       - name: Trigger dependabot PR merge workflow
         if: (github.event_name == 'pull_request') && (steps.commit-details.outputs.commit-author == 'dependabot[bot]')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh workflow run \
             merge-pr.yml \
