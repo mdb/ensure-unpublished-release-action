@@ -93,7 +93,7 @@ jobs:
           echo "exists: ${{ steps.ensure-unpublished-version.outputs.exists }}"
 
       - name: Trigger dependabot PR merge workflow
-        #if: (github.event_name == 'pull_request') && (steps.commit-details.outputs.commit-author == 'dependabot[bot]')
+        if: (github.event_name == 'pull_request') && (steps.commit-details.outputs.commit-author == 'dependabot[bot]')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
