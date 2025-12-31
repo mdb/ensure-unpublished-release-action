@@ -30,7 +30,7 @@ jobs:
           echo "pr-title=$pr_title" >> "$GITHUB_OUTPUT"
           echo "pr-url=$PR_URL" >> "$GITHUB_OUTPUT"
         env:
-          PR_URL: "https://github.com/mdb/ensure-unpublished-release-action/pulls/${{ inputs.pr-number }}"
+          PR_URL: "https://github.com/mdb/ensure-unpublished-release-action/pull/${{ inputs.pr-number }}"
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check checks
@@ -41,18 +41,17 @@ jobs:
       - name: Approve PR
         run: |
           gh pr review \
-            --approve \
-            "${{ inputs.pr-number }}"
+            "${{ inputs.pr-number }}" \
+            --approve
         env:
-          PR_URL: "${{ steps.pr-details.outputs.pr-url }}"
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Merge PR
         run: |
           gh pr merge \
+            "${{ inputs.pr-number }}" \
             --auto \
-            --body "${{ steps.pr-details.outputs.pr-title }}\n[skip release]"
-            "${{ inputs.pr-number }}"
+            --body "${{ steps.pr-details.outputs.pr-title }}\n[skip release]" \
+            --merge
         env:
-          PR_URL: "${{ steps.pr-details.outputs.pr-url }}"
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
