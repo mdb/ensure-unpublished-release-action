@@ -1,0 +1,7 @@
+export const tagInput = 'tag'
+export const failureMessageInput = 'failure-message'
+export const skipPatternInput = 'skip-pattern'
+export const skipCommitMessagePatternInput = 'skip-commit-message-pattern'
+export const commitMessageInput = 'commit-message'
+export const skipAuthorsInput = 'skip-authors'
+export const authorInput = 'author'

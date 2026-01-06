@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import {context} from '@actions/github'
 import {isExistingRelease, shouldSkip} from './is-existing-release'
+import {tagInput, failureMessageInput} from './inputs'
 
 export const run = async (): Promise<void> => {
   const {owner, repo} = context.repo
@@ -9,12 +10,12 @@ export const run = async (): Promise<void> => {
     const skipped = shouldSkip() ? true : false
     core.setOutput('skipped', skipped)
 
-    const tag: string = core.getInput('tag')
+    const tag: string = core.getInput(tagInput)
     const exists = await isExistingRelease(owner, repo, tag)
     core.setOutput('exists', exists)
 
     let failureMessage = `${owner}/${repo} release tag ${tag} exists`
-    const customFailureMessage: string = core.getInput('failure-message')
+    const customFailureMessage: string = core.getInput(failureMessageInput)
     if (customFailureMessage !== '') {
       failureMessage += `. ${customFailureMessage}`
     }
