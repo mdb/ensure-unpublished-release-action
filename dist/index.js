@@ -1,6 +1,24 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 6107:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.authorInput = exports.skipAuthorsInput = exports.commitMessageInput = exports.skipCommitMessagePatternInput = exports.skipPatternInput = exports.failureMessageInput = exports.tagInput = void 0;
+exports.tagInput = 'tag';
+exports.failureMessageInput = 'failure-message';
+exports.skipPatternInput = 'skip-pattern';
+exports.skipCommitMessagePatternInput = 'skip-commit-message-pattern';
+exports.commitMessageInput = 'commit-message';
+exports.skipAuthorsInput = 'skip-authors';
+exports.authorInput = 'author';
+
+
+/***/ }),
+
 /***/ 1122:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -52,6 +70,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.shouldSkip = exports.isExistingRelease = void 0;
 const core = __importStar(__nccwpck_require__(7484));
 const github_1 = __nccwpck_require__(3228);
+const inputs_1 = __nccwpck_require__(6107);
 const isExistingRelease = (owner, repo, tag) => __awaiter(void 0, void 0, void 0, function* () {
     const token = core.getInput('token');
     const octokit = (0, github_1.getOctokit)(token);
@@ -73,15 +92,15 @@ const isExistingRelease = (owner, repo, tag) => __awaiter(void 0, void 0, void 0
 });
 exports.isExistingRelease = isExistingRelease;
 const shouldSkip = () => {
-    const skipPattern = core.getInput('skip-pattern');
+    const skipPattern = core.getInput(inputs_1.skipPatternInput);
     if (skipPattern) {
-        core.warning('skip-pattern is deprecated. Use skip-commit-message-pattern.');
+        core.warning(`${inputs_1.skipPatternInput} is deprecated. Use ${inputs_1.skipCommitMessagePatternInput}.`);
     }
-    const skipCommitMessagePattern = core.getInput('skip-commit-message-pattern');
+    const skipCommitMessagePattern = core.getInput(inputs_1.skipCommitMessagePatternInput);
     const skipMessagePattern = skipCommitMessagePattern || skipPattern;
-    const commitMessage = core.getInput('commit-message');
+    const commitMessage = core.getInput(inputs_1.commitMessageInput);
     if (skipMessagePattern && !commitMessage) {
-        throw new Error(`commit-message unspecified. skip-commit-message-pattern (${skipMessagePattern}) requires specifying a commit-message`);
+        throw new Error(`${inputs_1.commitMessageInput} unspecified. ${inputs_1.skipCommitMessagePatternInput} (${skipMessagePattern}) requires specifying a ${inputs_1.commitMessageInput}`);
     }
     if (skipMessagePattern &&
         commitMessage &&
@@ -89,14 +108,14 @@ const shouldSkip = () => {
         core.info(`skipping ensure-unpublished-release; commit specifies ${skipMessagePattern}`);
         return true;
     }
-    const skipAuthors = core.getInput('skip-authors');
-    const author = core.getInput('author');
+    const skipAuthors = core.getInput(inputs_1.skipAuthorsInput);
+    const author = core.getInput(inputs_1.authorInput);
     const skipAuthorsList = skipAuthors.split('\n');
     if (skipAuthors && !author) {
-        throw new Error(`author unspecified. skip-authors (${skipAuthorsList.join(', ')}) requires specifying an author`);
+        throw new Error(`${inputs_1.authorInput} unspecified. ${inputs_1.skipAuthorsInput} (${skipAuthorsList.join(', ')}) requires specifying an ${inputs_1.authorInput}`);
     }
     if (skipAuthors && author && skipAuthorsList.includes(author.toLowerCase())) {
-        core.info(`skipping ensure-unpublished-release; author is ${author}`);
+        core.info(`skipping ensure-unpublished-release; ${inputs_1.authorInput} is ${author}`);
         return true;
     }
     return false;
@@ -158,16 +177,17 @@ exports.run = void 0;
 const core = __importStar(__nccwpck_require__(7484));
 const github_1 = __nccwpck_require__(3228);
 const is_existing_release_1 = __nccwpck_require__(1122);
+const inputs_1 = __nccwpck_require__(6107);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     const { owner, repo } = github_1.context.repo;
     try {
         const skipped = (0, is_existing_release_1.shouldSkip)() ? true : false;
         core.setOutput('skipped', skipped);
-        const tag = core.getInput('tag');
+        const tag = core.getInput(inputs_1.tagInput);
         const exists = yield (0, is_existing_release_1.isExistingRelease)(owner, repo, tag);
         core.setOutput('exists', exists);
         let failureMessage = `${owner}/${repo} release tag ${tag} exists`;
-        const customFailureMessage = core.getInput('failure-message');
+        const customFailureMessage = core.getInput(inputs_1.failureMessageInput);
         if (customFailureMessage !== '') {
             failureMessage += `. ${customFailureMessage}`;
         }

@@ -1,6 +1,13 @@
 import * as core from '@actions/core'
 import {RequestError} from '@octokit/request-error'
 import {getOctokit} from '@actions/github'
+import {
+  authorInput,
+  commitMessageInput,
+  skipAuthorsInput,
+  skipCommitMessagePatternInput,
+  skipPatternInput
+} from './inputs'
 
 export const isExistingRelease = async (
   owner: string,
@@ -29,20 +36,22 @@ export const isExistingRelease = async (
 }
 
 export const shouldSkip = (): boolean => {
-  const skipPattern: string = core.getInput('skip-pattern')
+  const skipPattern: string = core.getInput(skipPatternInput)
   if (skipPattern) {
-    core.warning('skip-pattern is deprecated. Use skip-commit-message-pattern.')
+    core.warning(
+      `${skipPatternInput} is deprecated. Use ${skipCommitMessagePatternInput}.`
+    )
   }
 
   const skipCommitMessagePattern: string = core.getInput(
-    'skip-commit-message-pattern'
+    skipCommitMessagePatternInput
   )
   const skipMessagePattern = skipCommitMessagePattern || skipPattern
-  const commitMessage: string = core.getInput('commit-message')
+  const commitMessage: string = core.getInput(commitMessageInput)
 
   if (skipMessagePattern && !commitMessage) {
     throw new Error(
-      `commit-message unspecified. skip-commit-message-pattern (${skipMessagePattern}) requires specifying a commit-message`
+      `${commitMessageInput} unspecified. ${skipCommitMessagePatternInput} (${skipMessagePattern}) requires specifying a ${commitMessageInput}`
     )
   }
 
@@ -57,18 +66,20 @@ export const shouldSkip = (): boolean => {
     return true
   }
 
-  const skipAuthors: string = core.getInput('skip-authors')
-  const author: string = core.getInput('author')
+  const skipAuthors: string = core.getInput(skipAuthorsInput)
+  const author: string = core.getInput(authorInput)
   const skipAuthorsList = skipAuthors.split('\n')
 
   if (skipAuthors && !author) {
     throw new Error(
-      `author unspecified. skip-authors (${skipAuthorsList.join(', ')}) requires specifying an author`
+      `${authorInput} unspecified. ${skipAuthorsInput} (${skipAuthorsList.join(', ')}) requires specifying an ${authorInput}`
     )
   }
 
   if (skipAuthors && author && skipAuthorsList.includes(author.toLowerCase())) {
-    core.info(`skipping ensure-unpublished-release; author is ${author}`)
+    core.info(
+      `skipping ensure-unpublished-release; ${authorInput} is ${author}`
+    )
     return true
   }
 
