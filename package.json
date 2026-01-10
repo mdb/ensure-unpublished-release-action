@@ -1,6 +1,6 @@
 {
   "name": "ensure-unpublished-release-action",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Check that a given GitHub release tag does not already exist",
   "main": "lib/main.js",
   "scripts": {
@@ -24,8 +24,8 @@
   "author": "mdb",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^2.0.1",
-    "@actions/github": "6.0.1"
+    "@actions/core": "^2.0.2",
+    "@actions/github": "7.0.0"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",
