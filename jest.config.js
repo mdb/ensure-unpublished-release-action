@@ -3,7 +3,10 @@ module.exports = {
   moduleFileExtensions: ['js', 'ts'],
   testMatch: ['**/*.test.ts'],
   transform: {
-    '^.+\\.ts$': 'ts-jest'
+    '^.+\\.[tj]s$': 'ts-jest'
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@octokit|universal-user-agent|before-after-hook)/)'
+  ],
   verbose: true
 }
