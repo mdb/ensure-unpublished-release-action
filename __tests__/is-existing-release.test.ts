@@ -1,5 +1,3 @@
-import * as core from '@actions/core'
-import {isExistingRelease, shouldSkip} from '../src/is-existing-release'
 import {jest, expect, test, describe, afterEach} from '@jest/globals'
 
 const mockOctokit = {
@@ -10,16 +8,26 @@ const mockOctokit = {
   }
 }
 
-jest.mock('@actions/github', () => {
-  return {
-    getOctokit: jest.fn(() => mockOctokit)
-  }
-})
+const mockCore = {
+  getInput: jest.fn(
+    (name: string) => process.env[`INPUT_${name.toUpperCase()}`] || ''
+  ),
+  info: jest.fn(),
+  warning: jest.fn()
+}
 
-jest.spyOn(core, 'info').mockImplementation(jest.fn())
-jest.spyOn(core, 'warning').mockImplementation(jest.fn())
+jest.unstable_mockModule('@actions/core', () => mockCore)
+
+jest.unstable_mockModule('@actions/github', () => ({
+  getOctokit: jest.fn(() => mockOctokit)
+}))
+
+const {isExistingRelease, shouldSkip} = await import(
+  '../src/is-existing-release.js'
+)
 
 afterEach(() => {
+  jest.clearAllMocks()
   process.env['INPUT_TAG'] = ''
   process.env['INPUT_FAILURE-MESSAGE'] = ''
   process.env['INPUT_SKIP-PATTERN'] = ''
@@ -72,10 +80,10 @@ describe('#shouldSkip', () => {
     const result = shouldSkip()
 
     expect(result).toBe(true)
-    expect(core.info).toHaveBeenCalledWith(
+    expect(mockCore.info).toHaveBeenCalledWith(
       `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
     )
-    expect(core.warning).toHaveBeenCalledWith(
+    expect(mockCore.warning).toHaveBeenCalledWith(
       'skip-pattern is deprecated. Use skip-commit-message-pattern.'
     )
   })
@@ -88,7 +96,7 @@ describe('#shouldSkip', () => {
     const result = shouldSkip()
 
     expect(result).toBe(true)
-    expect(core.info).toHaveBeenCalledWith(
+    expect(mockCore.info).toHaveBeenCalledWith(
       `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
     )
   })
@@ -112,7 +120,7 @@ bim`
 
     const result = shouldSkip()
     expect(result).toBe(true)
-    expect(core.info).toHaveBeenCalledWith(
+    expect(mockCore.info).toHaveBeenCalledWith(
       `skipping ensure-unpublished-release; author is ${author}`
     )
   })
