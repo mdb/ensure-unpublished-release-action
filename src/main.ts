@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import {context} from '@actions/github'
-import {isExistingRelease, shouldSkip} from './is-existing-release'
-import {tagInput, failureMessageInput} from './inputs'
+import {isExistingRelease, shouldSkip} from './is-existing-release.js'
+import {tagInput, failureMessageInput} from './inputs.js'
 
 export const run = async (): Promise<void> => {
   const {owner, repo} = context.repo

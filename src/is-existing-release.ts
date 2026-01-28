@@ -7,7 +7,7 @@ import {
   skipAuthorsInput,
   skipCommitMessagePatternInput,
   skipPatternInput
-} from './inputs'
+} from './inputs.js'
 
 export const isExistingRelease = async (
   owner: string,

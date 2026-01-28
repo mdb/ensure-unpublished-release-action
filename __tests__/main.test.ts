@@ -1,6 +1,4 @@
-import * as core from '@actions/core'
 import {jest, expect, test, afterEach, describe} from '@jest/globals'
-import {run} from '../src/main'
 
 const mockOctokit = {
   rest: {
@@ -10,22 +8,35 @@ const mockOctokit = {
   }
 }
 
-jest.mock('@actions/github', () => {
-  return {
-    ...(jest.requireActual('@actions/github') as object),
-    getOctokit: jest.fn(() => mockOctokit)
-  }
-})
+const mockCore = {
+  getInput: jest.fn(
+    (name: string) => process.env[`INPUT_${name.toUpperCase()}`] || ''
+  ),
+  setOutput: jest.fn(),
+  setFailed: jest.fn(),
+  info: jest.fn(),
+  warning: jest.fn()
+}
+
+jest.unstable_mockModule('@actions/core', () => mockCore)
+
+jest.unstable_mockModule('@actions/github', () => ({
+  context: {
+    get repo() {
+      const [owner, repo] = (process.env['GITHUB_REPOSITORY'] || '/').split('/')
+      return {owner, repo}
+    }
+  },
+  getOctokit: jest.fn(() => mockOctokit)
+}))
+
+const {run} = await import('../src/main.js')
 
 const repo = 'mdb/terraputs'
 const tag = '500.0.0'
 
-jest.spyOn(core, 'info').mockImplementation(jest.fn())
-jest.spyOn(core, 'warning').mockImplementation(jest.fn())
-jest.spyOn(core, 'setOutput').mockImplementation(jest.fn())
-jest.spyOn(core, 'setFailed').mockImplementation(jest.fn())
-
 afterEach(() => {
+  jest.clearAllMocks()
   process.env['INPUT_TAG'] = ''
   process.env['INPUT_FAILURE-MESSAGE'] = ''
   process.env['INPUT_SKIP-PATTERN'] = ''
@@ -48,12 +59,12 @@ describe('#run', () => {
 
     await run()
 
-    expect(core.setFailed).not.toHaveBeenCalled()
-    expect(core.info).toHaveBeenCalledWith(
+    expect(mockCore.setFailed).not.toHaveBeenCalled()
+    expect(mockCore.info).toHaveBeenCalledWith(
       `${repo} release tag ${tag} does not exist`
     )
-    expect(core.setOutput).toHaveBeenCalledWith('exists', false)
-    expect(core.setOutput).toHaveBeenCalledWith('skipped', false)
+    expect(mockCore.setOutput).toHaveBeenCalledWith('exists', false)
+    expect(mockCore.setOutput).toHaveBeenCalledWith('skipped', false)
   })
 
   test('when the release exists', async () => {
@@ -64,9 +75,9 @@ describe('#run', () => {
 
     await run()
 
-    expect(core.setOutput).toHaveBeenCalledWith('skipped', false)
-    expect(core.setOutput).toHaveBeenCalledWith('exists', true)
-    expect(core.setFailed).toHaveBeenCalledWith(
+    expect(mockCore.setOutput).toHaveBeenCalledWith('skipped', false)
+    expect(mockCore.setOutput).toHaveBeenCalledWith('exists', true)
+    expect(mockCore.setFailed).toHaveBeenCalledWith(
       `${repo} release tag ${tag} exists`
     )
   })
@@ -80,9 +91,9 @@ describe('#run', () => {
 
     await run()
 
-    expect(core.setOutput).toHaveBeenCalledWith('skipped', false)
-    expect(core.setOutput).toHaveBeenCalledWith('exists', true)
-    expect(core.setFailed).toHaveBeenCalledWith(
+    expect(mockCore.setOutput).toHaveBeenCalledWith('skipped', false)
+    expect(mockCore.setOutput).toHaveBeenCalledWith('exists', true)
+    expect(mockCore.setFailed).toHaveBeenCalledWith(
       `${repo} release tag ${tag} exists. Do something.`
     )
   })
@@ -99,8 +110,8 @@ describe('#run', () => {
 
     await run()
 
-    expect(core.setFailed).toHaveBeenCalledWith(errMessage)
-    expect(core.info).not.toHaveBeenCalled()
+    expect(mockCore.setFailed).toHaveBeenCalledWith(errMessage)
+    expect(mockCore.info).not.toHaveBeenCalled()
   })
 
   test('when the specified commit-message includes the specified skip-pattern and the release exists', async () => {
@@ -110,13 +121,13 @@ describe('#run', () => {
 
     await run()
 
-    expect(core.setFailed).not.toHaveBeenCalled()
-    expect(core.info).toHaveBeenCalledWith(
+    expect(mockCore.setFailed).not.toHaveBeenCalled()
+    expect(mockCore.info).toHaveBeenCalledWith(
       `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
     )
-    expect(core.setOutput).toHaveBeenCalledWith('exists', true)
-    expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
-    expect(core.warning).toHaveBeenCalledWith(
+    expect(mockCore.setOutput).toHaveBeenCalledWith('exists', true)
+    expect(mockCore.setOutput).toHaveBeenCalledWith('skipped', true)
+    expect(mockCore.warning).toHaveBeenCalledWith(
       'skip-pattern is deprecated. Use skip-commit-message-pattern.'
     )
   })
@@ -134,13 +145,13 @@ describe('#run', () => {
 
     await run()
 
-    expect(core.setFailed).not.toHaveBeenCalled()
-    expect(core.info).toHaveBeenCalledWith(
+    expect(mockCore.setFailed).not.toHaveBeenCalled()
+    expect(mockCore.info).toHaveBeenCalledWith(
       `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
     )
-    expect(core.setOutput).toHaveBeenCalledWith('exists', false)
-    expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
-    expect(core.warning).toHaveBeenCalledWith(
+    expect(mockCore.setOutput).toHaveBeenCalledWith('exists', false)
+    expect(mockCore.setOutput).toHaveBeenCalledWith('skipped', true)
+    expect(mockCore.warning).toHaveBeenCalledWith(
       'skip-pattern is deprecated. Use skip-commit-message-pattern.'
     )
   })
@@ -152,12 +163,12 @@ describe('#run', () => {
 
     await run()
 
-    expect(core.setFailed).not.toHaveBeenCalled()
-    expect(core.info).toHaveBeenCalledWith(
+    expect(mockCore.setFailed).not.toHaveBeenCalled()
+    expect(mockCore.info).toHaveBeenCalledWith(
       `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
     )
-    expect(core.setOutput).toHaveBeenCalledWith('exists', true)
-    expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
+    expect(mockCore.setOutput).toHaveBeenCalledWith('exists', true)
+    expect(mockCore.setOutput).toHaveBeenCalledWith('skipped', true)
   })
 
   test('when the specified commit-message includes the specified skip-commit-message-pattern and the release does not exist', async () => {
@@ -173,12 +184,12 @@ describe('#run', () => {
 
     await run()
 
-    expect(core.setFailed).not.toHaveBeenCalled()
-    expect(core.info).toHaveBeenCalledWith(
+    expect(mockCore.setFailed).not.toHaveBeenCalled()
+    expect(mockCore.info).toHaveBeenCalledWith(
       `skipping ensure-unpublished-release; commit specifies [skip version-eval]`
     )
-    expect(core.setOutput).toHaveBeenCalledWith('exists', false)
-    expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
+    expect(mockCore.setOutput).toHaveBeenCalledWith('exists', false)
+    expect(mockCore.setOutput).toHaveBeenCalledWith('skipped', true)
   })
 
   test('when a skip-commit-message-pattern is defined but no commit-message is defined', async () => {
@@ -189,8 +200,8 @@ describe('#run', () => {
     await run()
 
     const errMessage = `commit-message unspecified. skip-commit-message-pattern (${skipPattern}) requires specifying a commit-message`
-    expect(core.setFailed).toHaveBeenCalledWith(errMessage)
-    expect(core.setOutput).not.toHaveBeenCalled()
+    expect(mockCore.setFailed).toHaveBeenCalledWith(errMessage)
+    expect(mockCore.setOutput).not.toHaveBeenCalled()
   })
 
   test('when the skip-authors includes the author and the release exists', async () => {
@@ -202,12 +213,12 @@ bim`
 
     await run()
 
-    expect(core.setFailed).not.toHaveBeenCalled()
-    expect(core.info).toHaveBeenCalledWith(
+    expect(mockCore.setFailed).not.toHaveBeenCalled()
+    expect(mockCore.info).toHaveBeenCalledWith(
       `skipping ensure-unpublished-release; author is ${author}`
     )
-    expect(core.setOutput).toHaveBeenCalledWith('exists', true)
-    expect(core.setOutput).toHaveBeenCalledWith('skipped', true)
+    expect(mockCore.setOutput).toHaveBeenCalledWith('exists', true)
+    expect(mockCore.setOutput).toHaveBeenCalledWith('skipped', true)
   })
 
   test('when a skip-authors is defined but no author is defined', async () => {
@@ -218,7 +229,7 @@ bim`
     await run()
 
     const errMessage = `author unspecified. skip-authors (${skipAuthors}) requires specifying an author`
-    expect(core.setFailed).toHaveBeenCalledWith(errMessage)
-    expect(core.setOutput).not.toHaveBeenCalled()
+    expect(mockCore.setFailed).toHaveBeenCalledWith(errMessage)
+    expect(mockCore.setOutput).not.toHaveBeenCalled()
   })
 })
