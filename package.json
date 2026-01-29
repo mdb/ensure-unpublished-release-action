@@ -6,12 +6,12 @@
   "type": "module",
   "scripts": {
     "build": "npx tsc",
-    "format": "npx prettier --write '**/*.ts'",
-    "format-check": "npx prettier --check '**/*.ts'",
+    "format:write": "npx prettier --write '**/*.ts'",
+    "format:check": "npx prettier --check '**/*.ts'",
     "lint": "npx eslint",
     "package": "npx ncc build --source-map --license licenses.txt",
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 NODE_ENV=test npx jest",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
+    "all": "npm run build && npm run format:write && npm run lint && npm run package && npm test"
   },
   "repository": {
     "type": "git",

@@ -1,3 +1,6 @@
-dist/
+.DS_Store
+.licenses/
 lib/
+dist/
 node_modules/
+coverage/
