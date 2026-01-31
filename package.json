@@ -15,6 +15,9 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 NODE_ENV=test npx jest",
     "all": "npm run format:write && npm run lint && npm run test && npm run package"
   },
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mdb/ensure-unpublished-release-action.git"
