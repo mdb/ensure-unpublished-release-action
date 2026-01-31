@@ -114,6 +114,20 @@ describe('#run', () => {
     expect(mockCore.info).not.toHaveBeenCalled()
   })
 
+  test('when an error occurs that is not an Error instance', async () => {
+    mockOctokit.rest.repos.getReleaseByTag = jest
+      .fn<() => Promise<never>>()
+      .mockRejectedValueOnce({status: 500})
+
+    process.env['INPUT_TAG'] = tag
+    process.env['GITHUB_REPOSITORY'] = repo
+
+    await run()
+
+    expect(mockCore.setFailed).not.toHaveBeenCalled()
+    expect(mockCore.info).not.toHaveBeenCalled()
+  })
+
   test('when the specified commit-message includes the specified skip-pattern and the release exists', async () => {
     const skipPattern = '[skip version-eval]'
     process.env['INPUT_SKIP-PATTERN'] = skipPattern
