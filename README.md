@@ -34,14 +34,14 @@ The action produces an `exists` output whose value is `true` or `false`.
     #
     # Example:
     # skip-commit-message-pattern: [skip ensure-version]
-    skip-commit-message-pattern: 
+    skip-commit-message-pattern:
 
     # Optional; the commit message (typically ${{ github.event.head_commit.message }}).
     # Required if skip-commit-message-pattern is set.
     #
     # Example:
     # commit-message: ${{ steps.commit-details.outputs.commit-message }}
-    commit-message: 
+    commit-message:
 
     # Optional; If any of the specified newline-separated list of skip-authors
     # matches the specified author, do not fail, regardless of whether the release
