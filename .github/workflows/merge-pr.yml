@@ -25,13 +25,13 @@ jobs:
         run: |
           pr_title="$(gh pr view \
             "${{ inputs.pr-number }}" \
-            --repo mdb/ensure-unpublished-release-action \
+            --repo ${{ github.repository }} \
             --json title \
             --jq '.title')"
           echo "pr-title=$pr_title" >> "$GITHUB_OUTPUT"
           echo "pr-url=$PR_URL" >> "$GITHUB_OUTPUT"
         env:
-          PR_URL: "https://github.com/mdb/ensure-unpublished-release-action/pull/${{ inputs.pr-number }}"
+          PR_URL: "https://github.com/${{ github.repository }}/pull/${{ inputs.pr-number }}"
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check checks
