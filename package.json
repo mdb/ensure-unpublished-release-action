@@ -1,6 +1,6 @@
 {
   "name": "ensure-unpublished-release-action",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Check that a given GitHub release tag does not already exist",
   "exports": {
     ".": "./dist/index.js"
