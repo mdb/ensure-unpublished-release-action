@@ -39,7 +39,7 @@
     "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-typescript": "^12.3.1",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@typescript-eslint/parser": "^8.72.1",
     "eslint": "^10.13.0",
     "eslint-plugin-github": "^6.1.2",
